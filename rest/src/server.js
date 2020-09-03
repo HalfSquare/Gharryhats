@@ -2,7 +2,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
-require('./item');
+var itemManager = require('./item');
 var HATS_COLLECTION = 'hats';
 
 var app = express();
@@ -61,10 +61,13 @@ app.post("/api/hats", function (req, res) {
   var newHat = req.body;
   newHat.createDate = new Date();
 
-  if (!req.body.name) {
-    handleError(res, "Invalid user input", "Must provide a name.", 400);
+  let missingKeys = itemManager.validateItem(newHat);
+
+  if (missingKeys.length > 0) {
+
+    handleError(res, "Invalid user input", "Must provide the following: " + missingKeys.toString().replace(/,/g, ', '), 400);
   } else {
-    db.collection(HATS_COLLECTION).insertOne(newHat, function(err, doc) {
+    db.collection(HATS_COLLECTION).insertOne(newHat, function (err, doc) {
       if (err) {
         handleError(res, err.message, "Failed to create new hat.");
       } else {
