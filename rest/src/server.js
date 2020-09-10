@@ -12,10 +12,10 @@ app.use(bodyParser.json());
 var db;
 
 // For accessing the live database locally
-// process.env.MONGODB_URI = "mongodb+srv://herokuRestNode:KnND571lRn10cZDk@nwen304-shop-db.f9hmb.mongodb.net/store?retryWrites=true&w=1";
+process.env.MONGODB_URI = "mongodb+srv://herokuRestNode:KnND571lRn10cZDk@nwen304-shop-db.f9hmb.mongodb.net/store?retryWrites=true&w=1";
 
 // Connect to the database
-let client = new MongoClient(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology:true, authMechanism: 'SCRAM-SHA-1' });
+let client = new MongoClient(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology: true, authMechanism: 'SCRAM-SHA-1' });
 client.connect(err => {
   if (err) {
     console.log(err);
@@ -24,7 +24,6 @@ client.connect(err => {
 
   // Get the database callback
   db = client.db();
-  console.log("DB connection ready");
 
   // Init the app
   var server = app.listen(process.env.PORT || 8080, function () {
@@ -48,10 +47,12 @@ function handleError(res, reason, message, code) {
 /*  "/api/hats"
  *    GET: finds all hats
  *    POST: creates a new hat
+ *    DELETE: deletes a hat by id
  */
 
 // GET
 app.get("/api/hats", function (req, res) {
+  console.log("Recived GET request");
   db.collection(HATS_COLLECTION).find({}).toArray(function (err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get hats.");
@@ -80,4 +81,23 @@ app.post("/api/hats", function (req, res) {
       }
     });
   }
+});
+
+// DELETE
+app.delete("/api/hats", function (req, res) {
+  var id = new ObjectID(req.query.id);
+
+  if (req.query.id) {
+    db.collection(HATS_COLLECTION).deleteOne({ _id: id }, function (err, result) {
+      if (err) {
+        handleError(res, err.message, "Failed to delete hat");
+      } else {
+        res.status(200).json(req.params.id);
+      }
+    });
+  } else {
+    handleError(res, "No id supplied", "Failed to delete hat. Please supply an id")
+  }
+
+
 });
