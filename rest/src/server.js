@@ -25,14 +25,12 @@ client.connect(err => {
   // Get the database callback
   db = client.db();
 
-  // Init the app
+  // Init the server
   var server = app.listen(process.env.PORT || 8080, function () {
     var port = server.address().port;
     console.log("running on port", port);
   })
 })
-
-
 
 
 
@@ -53,6 +51,7 @@ function handleError(res, reason, message, code) {
 // GET
 app.get("/api/hats", function (req, res) {
   console.log("Recived GET request");
+
   db.collection(HATS_COLLECTION).find({}).toArray(function (err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get hats.");
@@ -62,17 +61,25 @@ app.get("/api/hats", function (req, res) {
   });
 });
 
+
 // POST
 app.post("/api/hats", function (req, res) {
+  console.log("Recived POST request");
+
+
+  // Generate the hat to add to the database
   var newHat = req.body;
   newHat.createDate = new Date();
 
+
+  // Check if the hat is valid
   let missingKeys = itemManager.validateItem(newHat);
 
-  if (missingKeys.length > 0) {
 
+  if (missingKeys.length > 0) {
     handleError(res, "Invalid user input", "Must provide the following: " + missingKeys.toString().replace(/,/g, ', '), 400);
   } else {
+    // Insert the hat into the collection
     db.collection(HATS_COLLECTION).insertOne(newHat, function (err, doc) {
       if (err) {
         handleError(res, err.message, "Failed to create new hat.");
@@ -83,21 +90,24 @@ app.post("/api/hats", function (req, res) {
   }
 });
 
+
 // DELETE
 app.delete("/api/hats", function (req, res) {
-  var id = new ObjectID(req.query.id);
+  console.log("Recived DELETE request");
 
-  if (req.query.id) {
-    db.collection(HATS_COLLECTION).deleteOne({ _id: id }, function (err, result) {
+  var id = req.query.id;
+
+
+  // Ensure the request has an id supplied
+  if (id) {
+    db.collection(HATS_COLLECTION).deleteOne({ _id: new ObjectID(id) }, function (err, result) {
       if (err) {
         handleError(res, err.message, "Failed to delete hat");
       } else {
-        res.status(200).json(req.params.id);
+        res.status(200).json(id);
       }
     });
   } else {
     handleError(res, "No id supplied", "Failed to delete hat. Please supply an id")
   }
-
-
 });
