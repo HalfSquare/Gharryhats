@@ -4,7 +4,8 @@
   "description": "",
   "main": "controller.js",
   "dependencies": {
-    "mongodb": "^3.6.1"
+    "mongodb": "^3.6.1",
+    "requirejs": "^2.3.6"
   },
   "devDependencies": {},
   "scripts": {
