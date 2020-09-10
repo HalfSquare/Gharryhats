@@ -16,7 +16,7 @@ exports.Item = class Item {
  * Returns an array of keys that are missing from the object
  * that would qualify it as an Item
  * 
- * @param {Object} obj the object to test
+ * @param {Object} obj the item to validate
  */
 exports.validateItem = function (obj) {
   return keys.filter(key => !obj[key]);

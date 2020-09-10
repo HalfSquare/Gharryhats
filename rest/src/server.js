@@ -45,7 +45,6 @@ function handleError(res, reason, message, code) {
 /*  "/api/hats"
  *    GET: finds all hats
  *    POST: creates a new hat
- *    DELETE: deletes a hat by id
  */
 
 // GET
@@ -91,23 +90,48 @@ app.post("/api/hats", function (req, res) {
 });
 
 
+/*  "/api/hats/:id"
+ *    GET: get hat by id
+ *    PUT: update hat by id
+ *    DELETE: delete hat by id
+ */
+
+
+ // GET
+
+
+// PUT
+app.put("/api/hats/:id", function (req, res) {
+  // Change body to use update expression
+  var updateDoc = { $set: req.body };
+  delete updateDoc.$set._id;
+
+  var id = req.params.id;
+
+  // Update the hat
+  db.collection(HATS_COLLECTION).updateOne({ _id: new ObjectID(id) }, updateDoc, function (err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to update hat");
+    } else {
+      updateDoc.$set._id = id;
+      res.status(200).json(updateDoc.$set);
+    }
+  });
+});
+
+
 // DELETE
-app.delete("/api/hats", function (req, res) {
+app.delete("/api/hats/:id", function (req, res) {
   console.log("Recived DELETE request");
 
-  var id = req.query.id;
+  var id = req.params.id;
 
-
-  // Ensure the request has an id supplied
-  if (id) {
-    db.collection(HATS_COLLECTION).deleteOne({ _id: new ObjectID(id) }, function (err, result) {
-      if (err) {
-        handleError(res, err.message, "Failed to delete hat");
-      } else {
-        res.status(200).json(id);
-      }
-    });
-  } else {
-    handleError(res, "No id supplied", "Failed to delete hat. Please supply an id")
-  }
+  // Delete the hat with the given id
+  db.collection(HATS_COLLECTION).deleteOne({ _id: new ObjectID(id) }, function (err, result) {
+    if (err) {
+      handleError(res, err.message, "Failed to delete hat");
+    } else {
+      res.status(200).json(id);
+    }
+  });
 });
