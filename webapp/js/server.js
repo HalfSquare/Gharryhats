@@ -10,7 +10,8 @@ const server = http.createServer(function(req, res){
             getFile(req, res, './shop.html');
             break;
         case '/img':
-            
+            console.log(path.query);
+            getImg(req, res, './img/' + path.query['image']);
             break;
         default:
             getFile(req, res, './index.html');
@@ -31,4 +32,17 @@ function getFile(req, res, filename){
         res.write(data);
         return res.end();
     })   
+}
+
+function getImg(req, res, filename){
+    fs.readFile(filename, function(error, data){
+        if (error){
+            console.log(error);
+            res.writeHead(404,{'Content-Type': 'text/html'});
+            return res.end('404 not found');
+        }
+        res.writeHead(200, {'Content-Type': 'image/png'});
+        res.write(data);
+        return res.end();
+    }) 
 }
