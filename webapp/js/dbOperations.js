@@ -1,5 +1,7 @@
 var express = require("express");
 var bodyParser = require("body-parser");
+// const Promise = require("promise");
+
 var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 const MongoClient = mongodb.MongoClient;
@@ -10,6 +12,8 @@ var app = express();
 app.use(bodyParser.json());
 
 var db;
+
+const REST_DATABASE = "limitless-cove-65021.herokuapp.com";
 
 // For accessing the live database locally
 process.env.MONGODB_URI = "mongodb+srv://herokuRestNode:KnND571lRn10cZDk@nwen304-shop-db.f9hmb.mongodb.net/store?retryWrites=true&w=1";
@@ -29,19 +33,17 @@ exports.connect = function(){
 }
 
 
-exports.getAll = function() {
-    let hats = "";
-    app.get("/api/hats", function (req, res) {
-        console.log("Recived GET request");
 
+exports.getAll = function() {
+    let getHats = new Promise((resolve, reject) => {
         db.collection(HATS_COLLECTION).find({}).toArray(function (err, docs) {
             if (err) {
-                handleError(res, err.message, "Failed to get hats.");
+                reject(docs);
             } else {
-                hats = res.status(200).json(docs);
+                resolve(docs);
             }
         });
-    });
-    return hats;
+    }) 
+    return getHats;
 }
 

@@ -9,9 +9,9 @@ const server = http.createServer(function(req, res){
     switch(path.pathname){
         case '/shop':
             getFile(req, res, './shop.html');
-            let hats = dbOp.getAll();
-            console.log('hats: ' + hats);
-            //let p = document.getElementById("item").innerText = hats;
+            dbOp.getAll()
+                .then(hats => console.log(hats))
+                .catch(err => errorPage(req, res, err));
             break;
         case '/img':
             getImg(req, res, './img/' + path.query['image']);
@@ -48,4 +48,10 @@ function getImg(req, res, filename){
         res.write(data);
         return res.end();
     }) 
+}
+
+function errorPage(req, res, message) {
+    res.writeHead(404,{'Content-Type': 'text/html'});
+    res.write(message);
+    return res.end('404 not found');
 }
