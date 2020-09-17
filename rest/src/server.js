@@ -100,8 +100,9 @@ app.post(HATS_URL, function (req, res) {
 const HAT_BY_ID_URL = "/api/hats/:id";
 
  // GET
-app.put(HAT_BY_ID_URL, function (req, res) {
+app.get(HAT_BY_ID_URL, function (req, res) {
   
+  console.log("id");
   var id = req.params.id;
 
   // Find the hat with the matching id
