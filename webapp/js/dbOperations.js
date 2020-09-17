@@ -25,12 +25,6 @@ exports.connect = function(){
 
         // Get the database callback
         db = client.db();
-
-        // Init the server
-        let server = app.listen(process.env.PORT || 8080, function () {
-            let port = server.address().port;
-            console.log("running on port", port);
-        });
     });
 }
 

@@ -1,16 +1,19 @@
 const url=require('url');
 const fs=require('fs');
-
+const dbOp=require('./dbOperations');
 const http=require('http');
+dbOp.connect();
+
 const server = http.createServer(function(req, res){
     let path = url.parse(req.url, true);
-    console.log(path);
     switch(path.pathname){
         case '/shop':
             getFile(req, res, './shop.html');
+            let hats = dbOp.getAll();
+            console.log('hats: ' + hats);
+            //let p = document.getElementById("item").innerText = hats;
             break;
         case '/img':
-            console.log(path.query);
             getImg(req, res, './img/' + path.query['image']);
             break;
         default:
