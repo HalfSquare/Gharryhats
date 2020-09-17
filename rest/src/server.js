@@ -4,6 +4,7 @@ var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 const MongoClient = mongodb.MongoClient;
 var itemManager = require('./item');
+const mongoose = require("mongoose");
 var HATS_COLLECTION = 'hats';
 
 var app = express();
@@ -12,10 +13,10 @@ app.use(bodyParser.json());
 var db;
 
 // For accessing the live database locally
-// process.env.MONGODB_URI = "mongodb+srv://herokuRestNode:KnND571lRn10cZDk@nwen304-shop-db.f9hmb.mongodb.net/store?retryWrites=true&w=1";
+process.env.MONGODB_URI = "mongodb+srv://herokuRestNode:KnND571lRn10cZDk@nwen304-shop-db.f9hmb.mongodb.net/store?retryWrites=true&w=1";
 
 // Connect to the database
-let client = new MongoClient(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology:true, authMechanism: 'SCRAM-SHA-1' });
+let client = new MongoClient(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology: true, authMechanism: 'SCRAM-SHA-1' });
 client.connect(err => {
   if (err) {
     console.log(err);
@@ -24,17 +25,17 @@ client.connect(err => {
 
   // Get the database callback
   db = client.db();
-  console.log("DB connection ready");
 
-  // Init the app
+  // Init the server
   var server = app.listen(process.env.PORT || 8080, function () {
     var port = server.address().port;
     console.log("running on port", port);
   })
 })
 
-
-
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology: true, authMechanism: 'SCRAM-SHA-1' })
+    .then(() => console.log('Now connected to MongoDB!'))
+    .catch(err => console.error('Something went wrong', err));
 
 
 // *** API ROUTES *** \\
@@ -52,6 +53,8 @@ function handleError(res, reason, message, code) {
 
 // GET
 app.get("/api/hats", function (req, res) {
+  console.log("Recived GET request");
+
   db.collection(HATS_COLLECTION).find({}).toArray(function (err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get hats.");
@@ -61,17 +64,25 @@ app.get("/api/hats", function (req, res) {
   });
 });
 
+
 // POST
 app.post("/api/hats", function (req, res) {
+  console.log("Recived POST request");
+
+
+  // Generate the hat to add to the database
   var newHat = req.body;
   newHat.createDate = new Date();
 
+
+  // Check if the hat is valid
   let missingKeys = itemManager.validateItem(newHat);
 
-  if (missingKeys.length > 0) {
 
+  if (missingKeys.length > 0) {
     handleError(res, "Invalid user input", "Must provide the following: " + missingKeys.toString().replace(/,/g, ', '), 400);
   } else {
+    // Insert the hat into the collection
     db.collection(HATS_COLLECTION).insertOne(newHat, function (err, doc) {
       if (err) {
         handleError(res, err.message, "Failed to create new hat.");
@@ -80,4 +91,85 @@ app.post("/api/hats", function (req, res) {
       }
     });
   }
+});
+
+
+/*  "/api/hats/:id"
+ *    GET: get hat by id
+ *    PUT: update hat by id
+ *    DELETE: delete hat by id
+ */
+
+
+ // GET
+
+
+// PUT
+app.put("/api/hats/:id", function (req, res) {
+  // Change body to use update expression
+  var updateDoc = { $set: req.body };
+  delete updateDoc.$set._id;
+
+  var id = req.params.id;
+
+  // Update the hat
+  db.collection(HATS_COLLECTION).updateOne({ _id: new ObjectID(id) }, updateDoc, function (err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to update hat");
+    } else {
+      updateDoc.$set._id = id;
+      res.status(200).json(updateDoc.$set);
+    }
+  });
+});
+
+
+// DELETE
+app.delete("/api/hats/:id", function (req, res) {
+  console.log("Recived DELETE request");
+
+  var id = req.params.id;
+
+  // Delete the hat with the given id
+  db.collection(HATS_COLLECTION).deleteOne({ _id: new ObjectID(id) }, function (err, result) {
+    if (err) {
+      handleError(res, err.message, "Failed to delete hat");
+    } else {
+      res.status(200).json(id);
+    }
+  });
+});
+
+const { User } = require('../src/user');
+
+// SIGNUP
+app.post('/api/signup', async (req, res, next) => {
+  let user = await User.findOne({ email: req.body.email });
+    if (user) {
+        return res.status(400).send('Email address is already linked with an account');
+    } else {
+        user = new User({
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password
+        });
+        await user.save();
+        res.send(user);
+    }
+});
+
+// LOGIN
+app.post('/api/login', async(req, res) => {
+  var email = req.body.email;
+  var pass = req.body.password;
+
+  await User.findOne({email: email, password: pass}, function(err, user) {
+     if(err) return res.send('Login error');
+     if(!user) return res.send('Credentials do not match');
+     return res.send('Logged In!');
+  });
+});
+
+// LOGOUT
+app.get('/api/logout', function (req, res) {
 });
