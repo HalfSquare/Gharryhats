@@ -47,8 +47,10 @@ function handleError(res, reason, message, code) {
  *    POST: creates a new hat
  */
 
+ const HATS_URL = "/api/hats";
+
 // GET
-app.get("/api/hats", function (req, res) {
+app.get(HATS_URL, function (req, res) {
   console.log("Recived GET request");
 
   db.collection(HATS_COLLECTION).find({}).toArray(function (err, docs) {
@@ -62,7 +64,7 @@ app.get("/api/hats", function (req, res) {
 
 
 // POST
-app.post("/api/hats", function (req, res) {
+app.post(HATS_URL, function (req, res) {
   console.log("Recived POST request");
 
 
@@ -95,13 +97,28 @@ app.post("/api/hats", function (req, res) {
  *    PUT: update hat by id
  *    DELETE: delete hat by id
  */
-
+const HAT_BY_ID_URL = "/api/hats/:id";
 
  // GET
+app.get(HAT_BY_ID_URL, function (req, res) {
+  console.log("Recived GET:id request");
 
+  var id = req.params.id;
+
+  // Find the hat with the matching id
+  db.collection(HATS_COLLECTION).findOne({ _id: new ObjectID(id) }, function(err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to get hat");
+    } else {
+      res.status(200).json(doc);
+    }
+  });
+});
 
 // PUT
-app.put("/api/hats/:id", function (req, res) {
+app.put(HAT_BY_ID_URL, function (req, res) {
+  console.log("Recived POST request");
+
   // Change body to use update expression
   var updateDoc = { $set: req.body };
   delete updateDoc.$set._id;
@@ -121,7 +138,7 @@ app.put("/api/hats/:id", function (req, res) {
 
 
 // DELETE
-app.delete("/api/hats/:id", function (req, res) {
+app.delete(HAT_BY_ID_URL, function (req, res) {
   console.log("Recived DELETE request");
 
   var id = req.params.id;
