@@ -4,6 +4,7 @@ var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 const MongoClient = mongodb.MongoClient;
 var itemManager = require('./item');
+const mongoose = require("mongoose");
 var HATS_COLLECTION = 'hats';
 
 var app = express();
@@ -32,6 +33,9 @@ client.connect(err => {
   })
 })
 
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology: true, authMechanism: 'SCRAM-SHA-1' })
+    .then(() => console.log('Now connected to MongoDB!'))
+    .catch(err => console.error('Something went wrong', err));
 
 
 // *** API ROUTES *** \\
@@ -151,4 +155,38 @@ app.delete(HAT_BY_ID_URL, function (req, res) {
       res.status(200).json(id);
     }
   });
+});
+
+const { User } = require('../src/user');
+
+// SIGNUP
+app.post('/api/signup', async (req, res, next) => {
+  let user = await User.findOne({ email: req.body.email });
+    if (user) {
+        return res.status(400).send('Email address is already linked with an account');
+    } else {
+        user = new User({
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password
+        });
+        await user.save();
+        res.send(user);
+    }
+});
+
+// LOGIN
+app.post('/api/login', async(req, res) => {
+  var email = req.body.email;
+  var pass = req.body.password;
+
+  await User.findOne({email: email, password: pass}, function(err, user) {
+     if(err) return res.send('Login error');
+     if(!user) return res.send('Credentials do not match');
+     return res.send('Logged In!');
+  });
+});
+
+// LOGOUT
+app.get('/api/logout', function (req, res) {
 });
