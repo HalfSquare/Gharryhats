@@ -6,7 +6,7 @@ const MongoClient = mongodb.MongoClient;
 var itemManager = require('./item');
 const mongoose = require("mongoose");
 var HATS_COLLECTION = 'hats';
-const Auth = require('./auth');
+const Auth = require('./auth/auth');
 
 var jwt = require("jsonwebtoken");
 const config = require("../src/config/auth.config");
@@ -206,31 +206,47 @@ app.delete(HAT_BY_ID_URL, function (req, res) {
  *    TODO
  *    TODO
  */
+
 // SIGNUP
-app.post('/api/signup', async (req, res, next) => {
+app.post('/api/auth/signup', async (req, res) => {
   console.log("SIGN UP")
-  let user = await User.findOne({ email: req.body.email });
+
+  let email = req.body.email;
+  let name = req.body.name;
+  let password = req.body.password;
+
+  let user = await User.findOne({ email: email });
+
   if (user) {
-    return res.status(400).send('Email address is already linked with an account');
+    res.status(400).send('Email address is already linked with an account');
   } else {
     user = new User({
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password
+      name: name,
+      email: email,
+      password: password
     });
-    await user.save();
-    res.send(user)
+    user.save().then((err, user) => {
+      if (err) {
+        handleError(res, err.message, "Sign up error");
+      } else {
+        res.status(201).send(user);
+      }
+    });
   }
 });
 
 // LOGIN
-app.post('/api/login', async (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   var email = req.body.email;
   var pass = req.body.password;
 
   await User.findOne({ email: email, password: pass }, function (err, user) {
-    if (err) return res.send('Login error');
-    if (!user) return res.send('Credentials do not match');
+    if (err) {
+      handleError(res, err.message, "Error in finding user");
+    }
+    if (!user) {
+      res.status(401).send('Credentials do not match');
+    }
     var token = jwt.sign({ id: user.id }, config.secret, {
       expiresIn: 86400 // 24 hours
     });
@@ -246,5 +262,5 @@ app.post('/api/login', async (req, res) => {
 });
 
 // LOGOUT
-app.get('/api/logout', function (req, res) {
+app.post('/api/auth/logout', function (req, res) {
 });
