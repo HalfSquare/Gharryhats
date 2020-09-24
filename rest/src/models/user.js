@@ -13,6 +13,11 @@ const User = mongoose.model('User', new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    isAdmin: {
+        type: Boolean,
+        default: false,
+        required: true
     }
 }));
  
