@@ -6,6 +6,7 @@ const MongoClient = mongodb.MongoClient;
 var itemManager = require('./item');
 const mongoose = require("mongoose");
 var HATS_COLLECTION = 'hats';
+const Auth = require('./auth');
 
 var app = express();
 app.use(bodyParser.json());
@@ -34,8 +35,8 @@ client.connect(err => {
 })
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology: true, authMechanism: 'SCRAM-SHA-1' })
-    .then(() => console.log('Now connected to MongoDB!'))
-    .catch(err => console.error('Something went wrong', err));
+  .then(() => console.log('Now connected to MongoDB!'))
+  .catch(err => console.error('Something went wrong', err));
 
 
 // *** API ROUTES *** \\
@@ -51,7 +52,7 @@ function handleError(res, reason, message, code) {
  *    POST: creates a new hat
  */
 
- const HATS_URL = "/api/hats";
+const HATS_URL = "/api/hats";
 
 // GET
 app.get(HATS_URL, function (req, res) {
@@ -71,28 +72,40 @@ app.get(HATS_URL, function (req, res) {
 app.post(HATS_URL, function (req, res) {
   console.log("Recived POST request");
 
+  let email = req.headers.email;
+  let pass = req.headers.password;
+  let token = req.headers.token;
 
-  // Generate the hat to add to the database
-  var newHat = req.body;
-  newHat.createDate = new Date();
+  // Authenticate user
+  Auth.isValidUser(email, pass, token)
+    .then(isValid => {
+      if (isValid) {
+        // Generate the hat to add to the database
+        let newHat = req.body;
+        newHat.createDate = new Date();
 
 
-  // Check if the hat is valid
-  let missingKeys = itemManager.validateItem(newHat);
+        // Check if the hat is valid
+        let missingKeys = itemManager.validateItem(newHat);
 
 
-  if (missingKeys.length > 0) {
-    handleError(res, "Invalid user input", "Must provide the following: " + missingKeys.toString().replace(/,/g, ', '), 400);
-  } else {
-    // Insert the hat into the collection
-    db.collection(HATS_COLLECTION).insertOne(newHat, function (err, doc) {
-      if (err) {
-        handleError(res, err.message, "Failed to create new hat.");
+        if (missingKeys.length > 0) {
+          handleError(res, "Invalid user input", "Must provide the following: " + missingKeys.toString().replace(/,/g, ', '), 400);
+        } else {
+          // Insert the hat into the collection
+          db.collection(HATS_COLLECTION).insertOne(newHat, function (err, doc) {
+            if (err) {
+              handleError(res, err.message, "Failed to create new hat.");
+            } else {
+              res.status(201).json(doc.ops[0]);
+            }
+          });
+        }
       } else {
-        res.status(201).json(doc.ops[0]);
+        res.status(401).json({ "error": "Invalid user credentials" });
       }
-    });
-  }
+    })
+    .catch(err => handleError(res, err, "Error in validation"))
 });
 
 
@@ -103,14 +116,14 @@ app.post(HATS_URL, function (req, res) {
  */
 const HAT_BY_ID_URL = "/api/hats/:id";
 
- // GET
+// GET
 app.get(HAT_BY_ID_URL, function (req, res) {
   console.log("Recived GET:id request");
 
   var id = req.params.id;
 
   // Find the hat with the matching id
-  db.collection(HATS_COLLECTION).findOne({ _id: new ObjectID(id) }, function(err, doc) {
+  db.collection(HATS_COLLECTION).findOne({ _id: new ObjectID(id) }, function (err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to get hat");
     } else {
@@ -123,21 +136,34 @@ app.get(HAT_BY_ID_URL, function (req, res) {
 app.put(HAT_BY_ID_URL, function (req, res) {
   console.log("Recived POST request");
 
-  // Change body to use update expression
-  var updateDoc = { $set: req.body };
-  delete updateDoc.$set._id;
+  let email = req.headers.email;
+  let pass = req.headers.password;
+  let token = req.headers.token;
 
-  var id = req.params.id;
+  // Authenticate user
+  Auth.isValidUser(email, pass, token)
+    .then(isValid => {
+      if (isValid) {
+        // Change body to use update expression
+        var updateDoc = { $set: req.body };
+        delete updateDoc.$set._id;
 
-  // Update the hat
-  db.collection(HATS_COLLECTION).updateOne({ _id: new ObjectID(id) }, updateDoc, function (err, doc) {
-    if (err) {
-      handleError(res, err.message, "Failed to update hat");
-    } else {
-      updateDoc.$set._id = id;
-      res.status(200).json(updateDoc.$set);
-    }
-  });
+        var id = req.params.id;
+
+        // Update the hat
+        db.collection(HATS_COLLECTION).updateOne({ _id: new ObjectID(id) }, updateDoc, function (err, doc) {
+          if (err) {
+            handleError(res, err.message, "Failed to update hat");
+          } else {
+            updateDoc.$set._id = id;
+            res.status(200).json(updateDoc.$set);
+          }
+        });
+      } else {
+        res.status(401).json({ "error": "Invalid user credentials" });
+      }
+    })
+    .catch(err => handleError(res, err, "Error in validation"))
 });
 
 
@@ -145,45 +171,64 @@ app.put(HAT_BY_ID_URL, function (req, res) {
 app.delete(HAT_BY_ID_URL, function (req, res) {
   console.log("Recived DELETE request");
 
-  var id = req.params.id;
+  let email = req.headers.email;
+  let pass = req.headers.password;
+  let token = req.headers.token;
 
-  // Delete the hat with the given id
-  db.collection(HATS_COLLECTION).deleteOne({ _id: new ObjectID(id) }, function (err, result) {
-    if (err) {
-      handleError(res, err.message, "Failed to delete hat");
-    } else {
-      res.status(200).json(id);
-    }
-  });
+  // Authenticate user
+  Auth.isValidUser(email, pass, token)
+    .then(isValid => {
+      if (isValid) {
+        var id = req.params.id;
+
+        // Delete the hat with the given id
+        db.collection(HATS_COLLECTION).deleteOne({ _id: new ObjectID(id) }, function (err, result) {
+          if (err) {
+            handleError(res, err.message, "Failed to delete hat");
+          } else {
+            res.status(200).json(id);
+          }
+        });
+      } else {
+        res.status(401).json({ "error": "Invalid user credentials" });
+      }
+    })
+    .catch(err => handleError(res, err, "Error in validation"))
 });
 
 const { User } = require('../src/user');
 
+/*  "/api/auth/"
+ *    TODO
+ *    TODO
+ *    TODO
+ */
+
 // SIGNUP
 app.post('/api/signup', async (req, res, next) => {
   let user = await User.findOne({ email: req.body.email });
-    if (user) {
-        return res.status(400).send('Email address is already linked with an account');
-    } else {
-        user = new User({
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password
-        });
-        await user.save();
-        res.send(user);
-    }
+  if (user) {
+    return res.status(400).send('Email address is already linked with an account');
+  } else {
+    user = new User({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password
+    });
+    await user.save();
+    res.send(user);
+  }
 });
 
 // LOGIN
-app.post('/api/login', async(req, res) => {
+app.post('/api/login', async (req, res) => {
   var email = req.body.email;
   var pass = req.body.password;
 
-  await User.findOne({email: email, password: pass}, function(err, user) {
-     if(err) return res.send('Login error');
-     if(!user) return res.send('Credentials do not match');
-     return res.send('Logged In!');
+  await User.findOne({ email: email, password: pass }, function (err, user) {
+    if (err) return res.send('Login error');
+    if (!user) return res.send('Credentials do not match');
+    return res.send('Logged In!');
   });
 });
 
