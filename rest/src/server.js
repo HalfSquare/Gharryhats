@@ -8,10 +8,15 @@ const mongoose = require("mongoose");
 var HATS_COLLECTION = 'hats';
 const Auth = require('./auth');
 
+var jwt = require("jsonwebtoken");
+const config = require("../src/config/auth.config");
+
 var app = express();
 app.use(bodyParser.json());
 
 var db;
+
+const { User } = require('./models/user');
 
 // For accessing the live database locally
 process.env.MONGODB_URI = "mongodb+srv://herokuRestNode:KnND571lRn10cZDk@nwen304-shop-db.f9hmb.mongodb.net/store?retryWrites=true&w=1";
@@ -196,16 +201,14 @@ app.delete(HAT_BY_ID_URL, function (req, res) {
     .catch(err => handleError(res, err, "Error in validation"))
 });
 
-const { User } = require('../src/user');
-
 /*  "/api/auth/"
  *    TODO
  *    TODO
  *    TODO
  */
-
 // SIGNUP
 app.post('/api/signup', async (req, res, next) => {
+  console.log("SIGN UP")
   let user = await User.findOne({ email: req.body.email });
   if (user) {
     return res.status(400).send('Email address is already linked with an account');
@@ -216,7 +219,7 @@ app.post('/api/signup', async (req, res, next) => {
       password: req.body.password
     });
     await user.save();
-    res.send(user);
+    res.send(user)
   }
 });
 
@@ -228,7 +231,17 @@ app.post('/api/login', async (req, res) => {
   await User.findOne({ email: email, password: pass }, function (err, user) {
     if (err) return res.send('Login error');
     if (!user) return res.send('Credentials do not match');
-    return res.send('Logged In!');
+    var token = jwt.sign({ id: user.id }, config.secret, {
+      expiresIn: 86400 // 24 hours
+    });
+
+    res.status(200).send({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      accessToken: token
+    });
   });
 });
 
