@@ -13,11 +13,23 @@ const server = http.createServer(function(req, res){
                 .then(hats => console.log(hats))
                 .catch(err => errorPage(req, res, err));
             break;
+        case '/shop.html':
+            getFile(req, res, './shop.html');
+            dbOp.getAll()
+                .then(hats => console.log(hats))
+                .catch(err => errorPage(req, res, err));
+            break;
         case '/img':
             getImg(req, res, './img/' + path.query['image']);
             break;
-        default:
+        case '/index':
             getFile(req, res, './index.html');
+            break;
+        case '/index.html':
+            getFile(req, res, './index.html');
+            break;
+        default:
+            getFile(req, res, './404.html');
             break;
     }
 })
