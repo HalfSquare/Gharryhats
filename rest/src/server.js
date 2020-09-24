@@ -7,10 +7,15 @@ var itemManager = require('./item');
 const mongoose = require("mongoose");
 var HATS_COLLECTION = 'hats';
 
+var jwt = require("jsonwebtoken");
+const config = require("../src/config/auth.config");
+
 var app = express();
 app.use(bodyParser.json());
 
 var db;
+
+const { User } = require('./models/user');
 
 // For accessing the live database locally
 process.env.MONGODB_URI = "mongodb+srv://herokuRestNode:KnND571lRn10cZDk@nwen304-shop-db.f9hmb.mongodb.net/store?retryWrites=true&w=1";
@@ -34,8 +39,8 @@ client.connect(err => {
 })
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology: true, authMechanism: 'SCRAM-SHA-1' })
-    .then(() => console.log('Now connected to MongoDB!'))
-    .catch(err => console.error('Something went wrong', err));
+  .then(() => console.log('Now connected to MongoDB!'))
+  .catch(err => console.error('Something went wrong', err));
 
 
 // *** API ROUTES *** \\
@@ -51,7 +56,7 @@ function handleError(res, reason, message, code) {
  *    POST: creates a new hat
  */
 
- const HATS_URL = "/api/hats";
+const HATS_URL = "/api/hats";
 
 // GET
 app.get(HATS_URL, function (req, res) {
@@ -103,14 +108,14 @@ app.post(HATS_URL, function (req, res) {
  */
 const HAT_BY_ID_URL = "/api/hats/:id";
 
- // GET
+// GET
 app.get(HAT_BY_ID_URL, function (req, res) {
   console.log("Recived GET:id request");
 
   var id = req.params.id;
 
   // Find the hat with the matching id
-  db.collection(HATS_COLLECTION).findOne({ _id: new ObjectID(id) }, function(err, doc) {
+  db.collection(HATS_COLLECTION).findOne({ _id: new ObjectID(id) }, function (err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to get hat");
     } else {
@@ -157,33 +162,42 @@ app.delete(HAT_BY_ID_URL, function (req, res) {
   });
 });
 
-const { User } = require('../src/user');
-
 // SIGNUP
 app.post('/api/signup', async (req, res, next) => {
+  console.log("SIGN UP")
   let user = await User.findOne({ email: req.body.email });
-    if (user) {
-        return res.status(400).send('Email address is already linked with an account');
-    } else {
-        user = new User({
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password
-        });
-        await user.save();
-        res.send(user);
-    }
+  if (user) {
+    return res.status(400).send('Email address is already linked with an account');
+  } else {
+    user = new User({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password
+    });
+    await user.save();
+    res.status(200).send(user);
+  }
 });
 
 // LOGIN
-app.post('/api/login', async(req, res) => {
+app.post('/api/login', async (req, res) => {
   var email = req.body.email;
   var pass = req.body.password;
 
-  await User.findOne({email: email, password: pass}, function(err, user) {
-     if(err) return res.send('Login error');
-     if(!user) return res.send('Credentials do not match');
-     return res.send('Logged In!');
+  await User.findOne({ email: email, password: pass }, function (err, user) {
+    if (err) return res.send('Login error');
+    if (!user) return res.send('Credentials do not match');
+    var token = jwt.sign({ id: user.id }, config.secret, {
+      expiresIn: 86400 // 24 hours
+    });
+
+    res.status(200).send({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      accessToken: token
+    });
   });
 });
 
