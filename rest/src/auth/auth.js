@@ -1,33 +1,38 @@
 const { User } = require('../models/user');
-const jws = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config');
+const { Error } = require('../error/CustomMongoError');
 
 const invalidCredentials = (resolve, reject) => {
-  reject("Invalid credentials");
+  reject(Error("CredentialsNotGiven"));
 }
 
-const isValidUser = function (email, pass, token) {
+const validateUser = function (email, pass, token) {
+  if (typeof email === 'object' && email != null) {
+    pass = email.password;
+    token = email.token;
+    email = email.email;
+  } 
+
+  // Token validation
   if (token) {
     return new Promise((resolve, reject) => {
       jwt.verify(token, config.secret, (err, decoded) => {
         if (err) {
-          resolve(false);
+          reject(Error("ValidationError"));
         }
-        resolve(true);
+        //TODO check if token is in db
+        resolve();
       })
     });
   }
 
+  // Password validation
   else if (email && pass) {
     return new Promise((resolve, reject) => {
-      User.findOne({ email: email, password: pass }, function (err, user) {
-        if (err) {
-          reject('Login error');
-        } else if (!user) {
-          resolve(false);
-        }
-        resolve(true);
-      });
+      User.findOne({ email: email, password: pass })
+        .then(user => user ? resolve() : reject(Error("UserNotFound")))
+        .catch(err => reject(err));
     });
   }
 
@@ -36,4 +41,4 @@ const isValidUser = function (email, pass, token) {
   }
 }
 
-exports.isValidUser = isValidUser;
+exports.validateUser = validateUser;
