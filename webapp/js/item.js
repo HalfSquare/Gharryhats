@@ -5,8 +5,8 @@ class Item {
         this.price = price;
         this.color = color;
         this.animal = animal;
-        this.size = size;
         this.design = design;
         this.imageUrl = imageUrl;
+        this.size = size;
     }
 }
