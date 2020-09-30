@@ -14,6 +14,7 @@ const { User } = require('./models/user');
 const { Hat } = require("./models/hat");
 const { handleError, handleMongooseError } = require('./error/errorHandler');
 const { Error } = require('./error/CustomMongoError');
+const bcrypt = require('bcrypt');
 
 //TODO: remove
 const HATS_COLLECTION = 'hats';
@@ -132,10 +133,15 @@ app.delete(HAT_BY_ID_URL, function (req, res) {
 app.post(SIGNUP_URL, async (req, res) => {
   console.log("SIGN UP")
 
-  // Making a new user ignores random junk in body
-  new User(req.body).save()
+  var BCRYPT_SALT_ROUNDS = 12;
+  bcrypt.hash(req.body.password, BCRYPT_SALT_ROUNDS)
+  .then(function(hashedPassword) {
+    req.body.password = hashedPassword;
+    // Making a new user ignores random junk in body
+    new User(req.body).save()
     .then(user => res.status(201).send(user))
     .catch(err => handleMongooseError(res, err));
+  })
 
 });
 
@@ -145,9 +151,13 @@ app.post(LOGIN_URL, (req, res) => {
   var email = req.body.email;
   var pass = req.body.password;
 
-  User.findOne({ email: email, password: pass })
+  User.findOne({ email: email })
     .then(user => {
       if (user) {
+        var passIsValid = bcrypt.compareSync(pass, user.password);
+        if (!passIsValid) {
+          throw Error("InvalidPassword")
+        }
         return jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 });
       }
       throw Error("EmailNotFound");

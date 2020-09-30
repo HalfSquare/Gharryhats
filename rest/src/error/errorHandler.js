@@ -19,6 +19,9 @@ function handleMongooseError(res, err, code) {
       case 4:
         res.status(code || 401).json({ "error": "No user with matching credentials" })
         break;
+      case 6:
+        res.status(code || 401).json({ "error": "Incorrect password" })
+        break;
       default:
         handleError(res, err.message + "\nPlease handle Mongo error code: " + err.code, err.message)
     }
