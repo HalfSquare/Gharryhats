@@ -39,17 +39,53 @@
 
 <div class="container" style="margin-top:30px">
     <h1>Shop now</h1>
-    <div class="row">
-    
-      </div>
+    <div class="shop" id="hats">
+        <p>Hi there</p>
+    </div>
 </div>
-
-
-
 
 <div class="jumbotron text-center" style="margin-bottom:0">
   <p>Footer</p>
 </div>
+
+<!-- <script>
+  const loadHats = () => {
+    const xhttp = new XMLHttpRequest();
+
+    xhttp.open("GET", "https://limitless-cove-65021.herokuapp.com/api/hats", false);
+    xhttp.send();
+
+    const hats = JSON.parse(xhttp.responseText);
+
+    for (let hat of hats) {
+        const x = `
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">${hat.name}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${hat.price}</h6>
+
+                        <div>Author: ${hat.color}</div>
+                        <div>Publisher: ${hat.animal}</div>
+                        <div>Number Of Pages: ${hat.design}</div>
+
+                        <hr>
+
+                        <button type="button" class="btn btn-danger">Delete</button>
+                        <button types="button" class="btn btn-primary" data-toggle="modal"
+                            data-target="#editBookModal" onClick="setEditModal(${hat.price})">
+                            Edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `
+
+        document.getElementById('hats').innerHTML = document.getElementById('hats').innerHTML + x;
+    }
+}
+loadHats();
+</script> -->
 
 </body>
 </html>

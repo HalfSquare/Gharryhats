@@ -1,6 +1,7 @@
 const url=require('url');
 const fs=require('fs');
 const dbOp=require('./dbOperations');
+const dbFun=require('./dbFunctions');
 const http=require('http');
 dbOp.connect();
 
@@ -14,9 +15,11 @@ const server = http.createServer(function(req, res){
                 .catch(err => errorPage(req, res, err));
             break;
         case '/shop.html':
+            //res.setHeader()
             getFile(req, res, './shop.html');
             dbOp.getAll()
-                .then(hats => console.log(hats))
+                //.then(hats => console.log(hats))
+                .then()
                 .catch(err => errorPage(req, res, err));
             break;
         case '/img':
@@ -26,6 +29,9 @@ const server = http.createServer(function(req, res){
             getFile(req, res, './index.html');
             break;
         case '/index.html':
+            getFile(req, res, './index.html');
+            break;
+        case '/':
             getFile(req, res, './index.html');
             break;
         default:
@@ -43,8 +49,10 @@ function getFile(req, res, filename){
             res.writeHead(404,{'Content-Type': 'text/html'});
             return res.end('404 not found');
         }
+        console.log(data.toString());
+        let modified = data.toString().replace("<p>Hi there</p>", "<p>Frick javascript</p>");
         res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write(data);
+        res.write(modified);
         return res.end();
     })   
 }
