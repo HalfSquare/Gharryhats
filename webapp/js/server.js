@@ -9,29 +9,18 @@ const server = http.createServer(function(req, res){
     let path = url.parse(req.url, true);
     switch(path.pathname){
         case '/shop':
-            getFile(req, res, './shop.html');
-            dbOp.getAll()
-                .then(hats => console.log(hats))
-                .catch(err => errorPage(req, res, err));
-            break;
         case '/shop.html':
-            //res.setHeader()
-            getFile(req, res, './shop.html');
             dbOp.getAll()
                 //.then(hats => console.log(hats))
-                .then()
+                .then(hats => getShop(req, res, './shop.html', hats))
                 .catch(err => errorPage(req, res, err));
             break;
         case '/img':
             getImg(req, res, './img/' + path.query['image']);
             break;
-        case '/index':
-            getFile(req, res, './index.html');
-            break;
-        case '/index.html':
-            getFile(req, res, './index.html');
-            break;
         case '/':
+        case '/index':
+        case '/index.html':
             getFile(req, res, './index.html');
             break;
         default:
@@ -50,7 +39,21 @@ function getFile(req, res, filename){
             return res.end('404 not found');
         }
         console.log(data.toString());
-        let modified = data.toString().replace("<p>Hi there</p>", "<p>Frick javascript</p>");
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.write(data);
+        return res.end();
+    })   
+}
+
+function getShop(req, res, filename, hats){
+    fs.readFile(filename, function(error, data){
+        if (error){
+            console.log(error);
+            res.writeHead(404,{'Content-Type': 'text/html'});
+            return res.end('404 not found');
+        }
+        console.log(data.toString());
+        let modified = data.toString().replace("<p>Hi there</p>", "<p>" + JSON.stringify(hats) + "</p>");
         res.writeHead(200, {'Content-Type': 'text/html'});
         res.write(modified);
         return res.end();
