@@ -16,6 +16,11 @@ const { handleError, handleMongooseError } = require('./error/errorHandler');
 const { Error } = require('./error/CustomMongoError');
 const bcrypt = require('bcrypt');
 
+const AuthCode = require('./models/authCode');
+const Client = require('./models/client');
+const Token = require('./models/token');
+const RefreshToken = require('./models/refreshToken');
+
 //TODO: remove
 const HATS_COLLECTION = 'hats';
 
@@ -172,4 +177,135 @@ app.post(LOGIN_URL, (req, res) => {
 
 // LOGOUT
 app.post(LOGOUT_URL, function (req, res) {
+});
+
+// function start() {
+//   var client = new Client({
+//     name: 'Test',
+//     userId: 1,
+//     redirectUri: 'http://localhost:8080/callback'
+//   });
+//   client.save(function(err) {
+//     if (err) {
+//       next(new Error('Client name exists already'));
+//     }
+//   });
+// }
+
+// start();
+
+app.get('/authorize', function(req, res, next) {
+  var responseType = req.query.response_type;
+  var clientId = req.query.client_id;
+  var redirectUri = req.query.redirect_uri;
+  var scope = req.query.scope;
+  var state = req.query.state;
+
+  if (!responseType) {
+    // cancel the request - we miss the response type
+  }
+
+  if (responseType !== 'code') {
+    // notify the user about an unsupported response type
+  }
+
+  if (!clientId) {
+    // cancel the request - client id is missing
+  }
+
+  Client.findOne({
+    clientId: clientId
+  }, function (err, client) {
+
+    var authCode = new AuthCode({
+      clientId: clientId,
+      userId: client.userId,
+      redirectUri: redirectUri
+    })
+    authCode.save()
+
+    var response = {
+      state: state,
+      code: authCode.code
+    };
+
+    if (redirectUri) {
+      var redirect = redirectUri +
+        '?code=' + response.code +
+        (state === undefined ? '' : '&state=' + state);
+      res.redirect(redirect);
+    } else {
+      res.json(response);
+    }
+  });
+});
+
+app.post('/token', function (req, res) {
+  var grantType = req.body.grant_type;
+  var authCode = req.body.code;
+  var redirectUri = req.body.redirect_uri;
+  var clientId = req.body.client_id;
+
+  if (!grantType) {
+    // no grant type passed - cancel this request
+  }
+
+  if (grantType === 'authorization_code') {
+    AuthCode.findOne({
+      code: authCode
+    }, function(err, code) {
+      if (err) {
+        // handle the error
+      }
+
+      if (!code) {
+        // no valid authorization code provided - cancel
+      }
+
+      if (code.consumed) {
+        // the code got consumed already - cancel
+      }
+
+      code.consumed = true;
+      code.save();
+
+      if (code.redirectUri !== redirectUri) {
+        // cancel the request
+      }
+
+      // validate the client id - an extra security measure
+      Client.findOne({
+        clientId: clientId
+      }, function(error, client) {
+        if (error) {
+          // the client id provided was a mismatch or does not exist
+        }
+
+        if (!client) {
+          // the client id provided was a mismatch or does not exist
+        }
+
+        var _refreshToken = new RefreshToken({
+          userId: code.userId
+        });
+        _refreshToken.save();
+
+        var _token = new Token({
+          refreshToken: _refreshToken.token,
+          userId: code.userId
+        });
+        _token.save();
+
+        // send the new token to the consumer
+        var response = {
+          access_token: _token.accessToken,
+          refresh_token: _token.refreshToken,
+          expires_in: _token.expiresIn,
+          token_type: _token.tokenType
+        };
+
+        res.json(response);
+      });
+    });
+  }
 });
