@@ -47,3 +47,17 @@ exports.getAll = function() {
     return getHats;
 }
 
+exports.getItem = function(id) {
+    console.log(id);
+    let getHat = new Promise((resolve, reject) => {
+        db.collection(HATS_COLLECTION).find({_id:ObjectID(id)}).toArray(function (err, docs) {
+            if (err) {
+                reject(docs);
+            } else {
+                console.log(docs);
+                resolve(docs);
+            }
+        });
+    }) 
+    return getHat;
+}

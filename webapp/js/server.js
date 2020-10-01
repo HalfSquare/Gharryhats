@@ -16,15 +16,24 @@ const server = http.createServer(function(req, res){
                 .catch(err => errorPage(req, res, err));
             break;
         case '/img':
-            getImg(req, res, './img/' + path.query['image']);
+            getImg(req, res, './img/' + path.query['image']).catch(err => errorPage(req, res, err));
             break;
         case '/':
         case '/index':
         case '/index.html':
             getFile(req, res, './index.html');
             break;
+        case '/hat':
+            console.log(path.query.hatid);
+            dbOp.getItem(path.query.hatid)
+                //.then(hats => console.log(hats))
+                .then(hat => getItem(req, res, './shop.html', hat))
+                .catch(err => errorPage(req, res, err));
+            break;
+            break;
         default:
             getFile(req, res, './404.html');
+            console.log(path.pathname);
             break;
     }
 })
@@ -38,7 +47,7 @@ function getFile(req, res, filename){
             res.writeHead(404,{'Content-Type': 'text/html'});
             return res.end('404 not found');
         }
-        console.log(data.toString());
+        //console.log(data.toString());
         res.writeHead(200, {'Content-Type': 'text/html'});
         res.write(data);
         return res.end();
@@ -52,8 +61,25 @@ function getShop(req, res, filename, hats){
             res.writeHead(404,{'Content-Type': 'text/html'});
             return res.end('404 not found');
         }
-        console.log(data.toString());
-        let modified = data.toString().replace("<p>Hi there</p>", "<p>" + JSON.stringify(hats) + "</p>");
+        //console.log(data.toString());
+        let hatBlock = dbFun.showHats(hats);
+        let modified = data.toString().replace("<p>Hi there</p>", hatBlock);
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.write(modified);
+        return res.end();
+    })   
+}
+
+function getItem(req, res, filename, hat){
+    fs.readFile(filename, function(error, data){
+        if (error){
+            console.log(error);
+            res.writeHead(404,{'Content-Type': 'text/html'});
+            return res.end('404 not found');
+        }
+        //console.log(data.toString());
+        let hatBlock = dbFun.showHat(hat);
+        let modified = data.toString().replace("<p>Hi there</p>", hatBlock);
         res.writeHead(200, {'Content-Type': 'text/html'});
         res.write(modified);
         return res.end();
@@ -75,6 +101,7 @@ function getImg(req, res, filename){
 
 function errorPage(req, res, message) {
     res.writeHead(404,{'Content-Type': 'text/html'});
-    res.write(message);
+    console.log(message);
+    res.write(message.message);
     return res.end('404 not found');
 }
