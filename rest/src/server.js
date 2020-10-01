@@ -133,15 +133,25 @@ app.delete(HAT_BY_ID_URL, function (req, res) {
 app.post(SIGNUP_URL, async (req, res) => {
   console.log("SIGN UP")
 
-  var BCRYPT_SALT_ROUNDS = 12;
-  bcrypt.hash(req.body.password, BCRYPT_SALT_ROUNDS)
-  .then(function(hashedPassword) {
-    req.body.password = hashedPassword;
-    // Making a new user ignores random junk in body
-    new User(req.body).save()
-    .then(user => res.status(201).send(user))
+  let password = req.body.password;
+  let BCRYPT_SALT_ROUNDS = 12;
+
+  //Check password complexity
+  if (Auth.isPasswordComplex(password)) {
+    bcrypt.hash(req.body.password, BCRYPT_SALT_ROUNDS)
+    .then(hashedPassword => {
+      req.body.password = hashedPassword;
+      // Making a new user ignores random junk in body
+      new User(req.body).save()
+      .then(user => res.status(201).send(user))
+    })
     .catch(err => handleMongooseError(res, err));
-  })
+  } else {
+    handleMongooseError(res, Error("PasswordNotComplex"))
+  }
+
+  // Encrypt the password
+  
 
 });
 
