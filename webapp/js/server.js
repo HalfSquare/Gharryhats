@@ -16,7 +16,7 @@ const server = http.createServer(function(req, res){
                 .catch(err => errorPage(req, res, err));
             break;
         case '/img':
-            getImg(req, res, './img/' + path.query['image']).catch(err => errorPage(req, res, err));
+            getImg(req, res, './img/' + path.query['image']);
             break;
         case '/':
         case '/index':
