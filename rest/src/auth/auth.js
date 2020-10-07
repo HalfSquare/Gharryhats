@@ -47,5 +47,36 @@ const validateUser = function (email, pass, token) {
   }
 }
 
+var Token = require('../models/oAuth/token');
+
+var authorize = function(req, res, next) {
+  var accessToken;
+
+  if (req.headers.authorization) {
+    var parts = req.headers.authorization.split(' ');
+
+    if (parts.length < 2) {
+      res.set('WWW-Authenticate', 'Bearer');
+      res.sendStatus('401');
+      return;
+    }
+    accessToken = parts[1];
+  } else {
+    accessToken = req.query.access_token || req.body.access_token;
+  }
+
+  Token.findOne({
+    accessToken: accessToken
+  }, function(err, token) {
+    Token.update({
+      userId: token.userId,
+      consumed: false
+    }, {
+      $set: { consumed: true }
+    });
+  });
+};
+
+exports.authorize = authorize;
 exports.validateUser = validateUser;
 exports.isPasswordComplex = isPasswordComplex;

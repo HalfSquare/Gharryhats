@@ -1,3 +1,4 @@
 module.exports = {
-    secret: "bezkoder-secret-key"
+    access_secret: "secretghatsaccess",
+    refresh_secret: "refreshghatssecret"
 };
