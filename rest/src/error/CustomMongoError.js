@@ -4,7 +4,8 @@ const errorCodes = {
   "ValidationError": 3,
   "UserNotFound": 4,
   "HatNotFound": 5,
-  "InvalidPassword": 6
+  "InvalidPassword": 6,
+  "PasswordNotComplex": 7,
 }
 
 const error = function(code) {return { name: "CustomMongoError", code: errorCodes[code] }; }

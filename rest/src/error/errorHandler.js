@@ -22,6 +22,9 @@ function handleMongooseError(res, err, code) {
       case 6:
         res.status(code || 401).json({ "error": "Incorrect password" })
         break;
+      case 7:
+        res.status(code || 400).json({ "error": "Please make your password more secure. Include at least one uppercase, one lowercase and one number. Make sure the password is 8 characters long." })
+        break;
       default:
         handleError(res, err.message + "\nPlease handle Mongo error code: " + err.code, err.message)
     }
