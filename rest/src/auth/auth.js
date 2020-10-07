@@ -41,7 +41,7 @@ const validateUser = function (email, pass, token) {
   }
 }
 
-var Token = require('../models/token');
+var Token = require('../models/oAuth/token');
 
 var authorize = function(req, res, next) {
   var accessToken;

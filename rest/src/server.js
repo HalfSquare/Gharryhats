@@ -16,10 +16,9 @@ const { handleError, handleMongooseError } = require('./error/errorHandler');
 const { Error } = require('./error/CustomMongoError');
 const bcrypt = require('bcrypt');
 
-const AuthCode = require('./models/authCode');
+const AuthCode = require('./models/oAuth/authCode');
 const Client = require('./models/client');
-const Token = require('./models/token');
-const RefreshToken = require('./models/refreshToken');
+const Token = require('./models/oAuth/token');
 
 //TODO: remove
 const HATS_COLLECTION = 'hats';
@@ -179,44 +178,19 @@ app.post(LOGIN_URL, (req, res) => {
 app.post(LOGOUT_URL, function (req, res) {
 });
 
-// function start() {
-//   var client = new Client({
-//     name: 'Test',
-//     userId: 1,
-//     redirectUri: 'http://localhost:8080/callback'
-//   });
-//   client.save(function(err) {
-//     if (err) {
-//       next(new Error('Client name exists already'));
-//     }
-//   });
-// }
-
-// start();
-
-app.get('/authorize', function(req, res, next) {
+app.get('/oauth/authorize', function(req, res) {
   var responseType = req.query.response_type;
   var clientId = req.query.client_id;
   var redirectUri = req.query.redirect_uri;
   var scope = req.query.scope;
   var state = req.query.state;
 
-  if (!responseType) {
-    // cancel the request - we miss the response type
-  }
-
-  if (responseType !== 'code') {
-    // notify the user about an unsupported response type
-  }
-
-  if (!clientId) {
-    // cancel the request - client id is missing
-  }
-
   Client.findOne({
     clientId: clientId
   }, function (err, client) {
-
+    if (!client){
+      // TODO    
+    }
     var authCode = new AuthCode({
       clientId: clientId,
       userId: client.userId,
@@ -240,72 +214,48 @@ app.get('/authorize', function(req, res, next) {
   });
 });
 
-app.post('/token', function (req, res) {
+app.post('/oauth/token', function (req, res) {
   var grantType = req.body.grant_type;
   var authCode = req.body.code;
-  var redirectUri = req.body.redirect_uri;
+  var redirectUri = req.body.redirect_uri; // TODO maybe?
   var clientId = req.body.client_id;
-
-  if (!grantType) {
-    // no grant type passed - cancel this request
-  }
 
   if (grantType === 'authorization_code') {
     AuthCode.findOne({
       code: authCode
     }, function(err, code) {
-      if (err) {
-        // handle the error
-      }
+      if (code) {
+        code.consumed = true;
+        code.save();
 
-      if (!code) {
-        // no valid authorization code provided - cancel
-      }
+        Client.findOne({
+          clientId: clientId
+        }, function(error, client) {
 
-      if (code.consumed) {
-        // the code got consumed already - cancel
-      }
+          if (!client) {
+            // TODO
+          }
 
-      code.consumed = true;
-      code.save();
+          var refreshToken = jwt.sign({ id: code.userId }, config.refresh_secret, { expiresIn: 86400 });
+          var accessToken = jwt.sign({ id: code.userId }, config.access_secret, { expiresIn: 3600 });
 
-      if (code.redirectUri !== redirectUri) {
-        // cancel the request
-      }
+          var token = new Token({
+            refreshToken: refreshToken,
+            accessToken: accessToken,
+            userId: code.userId
+          });
+          token.save();
 
-      // validate the client id - an extra security measure
-      Client.findOne({
-        clientId: clientId
-      }, function(error, client) {
-        if (error) {
-          // the client id provided was a mismatch or does not exist
-        }
+          var response = {
+            access_token: token.accessToken,
+            refresh_token: token.refreshToken,
+            expires_in: token.expiresIn,
+            token_type: token.tokenType
+          };
 
-        if (!client) {
-          // the client id provided was a mismatch or does not exist
-        }
-
-        var _refreshToken = new RefreshToken({
-          userId: code.userId
+          res.json(response);
         });
-        _refreshToken.save();
-
-        var _token = new Token({
-          refreshToken: _refreshToken.token,
-          userId: code.userId
-        });
-        _token.save();
-
-        // send the new token to the consumer
-        var response = {
-          access_token: _token.accessToken,
-          refresh_token: _token.refreshToken,
-          expires_in: _token.expiresIn,
-          token_type: _token.tokenType
-        };
-
-        res.json(response);
-      });
+      }
     });
   }
 });
