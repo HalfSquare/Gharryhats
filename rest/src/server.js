@@ -20,6 +20,9 @@ const AuthCode = require('./models/oAuth/authCode');
 const Client = require('./models/client');
 const Token = require('./models/oAuth/token');
 
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+
 //TODO: remove
 const HATS_COLLECTION = 'hats';
 
@@ -31,6 +34,13 @@ const LOGOUT_URL = "/api/auth/logout";
 
 const app = express();
 app.use(bodyParser.json());
+
+app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'sessGhatsSecret',
+  resave: false,
+  saveUninitialized: false
+}));
 
 // For accessing the live database locally
 process.env.MONGODB_URI = "mongodb+srv://herokuRestNode:KnND571lRn10cZDk@nwen304-shop-db.f9hmb.mongodb.net/store?retryWrites=true&w=1";
@@ -162,15 +172,11 @@ app.post(LOGIN_URL, (req, res) => {
         if (!passIsValid) {
           throw Error("InvalidPassword")
         }
-        return jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 });
+        req.session.user = user
+        return res.redirect("/oauth/authorise");
       }
       throw Error("EmailNotFound");
     })
-    .then(token => {
-      //TODO: save the token
-      return token;
-    })
-    .then(token => res.status(200).send({ "token": token }))
     .catch(err => handleMongooseError(res, err));
 });
 
@@ -178,12 +184,17 @@ app.post(LOGIN_URL, (req, res) => {
 app.post(LOGOUT_URL, function (req, res) {
 });
 
-app.get('/oauth/authorize', function(req, res) {
+app.get('/oauth/authorise', function(req, res) {
   var responseType = req.query.response_type;
   var clientId = req.query.client_id;
   var redirectUri = req.query.redirect_uri;
   var scope = req.query.scope;
   var state = req.query.state;
+  if (!req.session || !req.session.user) {
+    // User is not logged in
+    // TODO direct to login page
+    return res.redirect(LOGIN_URL);
+  }
 
   Client.findOne({
     clientId: clientId
@@ -193,7 +204,7 @@ app.get('/oauth/authorize', function(req, res) {
     }
     var authCode = new AuthCode({
       clientId: clientId,
-      userId: client.userId,
+      userId: req.session.user.id,
       redirectUri: redirectUri
     })
     authCode.save()
@@ -236,8 +247,10 @@ app.post('/oauth/token', function (req, res) {
             // TODO
           }
 
-          var refreshToken = jwt.sign({ id: code.userId }, config.refresh_secret, { expiresIn: 86400 });
-          var accessToken = jwt.sign({ id: code.userId }, config.access_secret, { expiresIn: 3600 });
+          var refreshToken = jwt.sign({ id: req.session.user }, config.refresh_secret, { expiresIn: 86400 });
+          var accessToken = jwt.sign({ id: req.session.user }, config.access_secret, { expiresIn: 3600 });
+
+          req.session.accessToken = accessToken;
 
           var token = new Token({
             refreshToken: refreshToken,
