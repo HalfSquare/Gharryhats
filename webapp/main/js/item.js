@@ -1,5 +1,5 @@
 class Item {
-    constructor(id, name, price, animal, color, design, imageUrl) {
+    constructor(id, name, price, color, animal, size, design, imageUrl) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -7,10 +7,6 @@ class Item {
         this.animal = animal;
         this.design = design;
         this.imageUrl = imageUrl;
-
-        this.isMarked = false;
-    }
-    toggle() {
-        this.isMarked = !this.isMarked;
+        this.size = size;
     }
 }
