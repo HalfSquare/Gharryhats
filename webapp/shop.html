@@ -4,11 +4,11 @@
   <title>Gharryhats - Shop Now</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./main/css/design.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="./css/design.css">
 </head>
 <body>
 
@@ -49,45 +49,6 @@
 <div class="jumbotron text-center" style="margin-bottom:0">
   <p>Footer</p>
 </div>
-
-<!-- <script>
-  const loadHats = () => {
-    const xhttp = new XMLHttpRequest();
-
-    xhttp.open("GET", "https://limitless-cove-65021.herokuapp.com/api/hats", false);
-    xhttp.send();
-
-    const hats = JSON.parse(xhttp.responseText);
-
-    for (let hat of hats) {
-        const x = `
-            <div class="col-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">${hat.name}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">${hat.price}</h6>
-
-                        <div>Author: ${hat.color}</div>
-                        <div>Publisher: ${hat.animal}</div>
-                        <div>Number Of Pages: ${hat.design}</div>
-
-                        <hr>
-
-                        <button type="button" class="btn btn-danger">Delete</button>
-                        <button types="button" class="btn btn-primary" data-toggle="modal"
-                            data-target="#editBookModal" onClick="setEditModal(${hat.price})">
-                            Edit
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `
-
-        document.getElementById('hats').innerHTML = document.getElementById('hats').innerHTML + x;
-    }
-}
-loadHats();
-</script> -->
 
 </body>
 </html>
