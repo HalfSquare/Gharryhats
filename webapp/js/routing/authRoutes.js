@@ -1,7 +1,7 @@
 const express = require('express');
 let router = express.Router();
 
-router.get("/login", (req, res, next) => {
+router.get("/login", (req, res, next) => {  
     res.send("login");
 });
 

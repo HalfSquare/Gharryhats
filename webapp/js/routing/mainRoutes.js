@@ -6,6 +6,7 @@ const getShop = require('../pageGetters/getShop');
 const getItem = require('../pageGetters/getItem');
 const getImg = require('../pageGetters/getImg');
 const getError = require('../pageGetters/getError');
+const getCart = require('../pageGetters/getCart');
 
 // Define the router
 let router = express.Router();
@@ -27,6 +28,15 @@ router.get('/hat/:hatid', (req, res, next) => {
     dbOp.getItem(req.params.hatid)
                 .then(hat => getItem(req, res, './shop.html', hat))
                 .catch(err => getError(req, res, err));
+});
+
+// Get cart
+router.get('/cart', (req, res) => {
+    // dbOp.getUser()
+    //             .then(user => getCart(req, res, './cart.html', user))
+    //             .catch(err => getError(req, res, err));
+    dbOp.getUser();
+    getCart(req, res, './cart.html', 'undefined'); 
 });
 
 // Login redirect

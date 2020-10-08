@@ -9,7 +9,7 @@ exports.showHats = function(hats){
         //console.log(hat);
         //console.log(hat._id);
         htmlString += '<a href="/hat?hatid=' + hat._id + '">';
-        htmlString += '<img src="' + hat.imageUrl + '" alt="Dog Hat" height="100" width="100"></img>';
+        htmlString += '<img src="img/' + hat.imageUrl + '" alt="' + hat.name + '" height="100" width="100"></img>';
         htmlString += '</a>';
         htmlString += "<p>" + hat.name + " for " + hat.animal + "</p>";
         htmlString += "<p>" + "$" + hat.price + "</p>";

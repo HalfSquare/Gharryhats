@@ -61,3 +61,9 @@ exports.getItem = function(id) {
     }) 
     return getHat;
 }
+
+exports.getUser = function() {
+    //TO-DO
+    console.log("Getting user");
+    return 'undefined';
+}
