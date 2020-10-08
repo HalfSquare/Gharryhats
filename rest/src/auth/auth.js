@@ -25,7 +25,7 @@ const validateUser = function (email, pass, token) {
   // Token validation
   if (token) {
     return new Promise((resolve, reject) => {
-      jwt.verify(token, config.secret, (err, decoded) => {
+      jwt.verify(token, config.access_secret, (err, decoded) => {
         if (err) {
           reject(Error("ValidationError"));
         }
@@ -59,6 +59,7 @@ function oauth_authorise(req, res) {
   if (!req.session || !req.session.user) {
     // User is not logged in
     // TODO direct to login page
+    console.log("user not logged in");
     return res.redirect(LOGIN_URL);
   }
 

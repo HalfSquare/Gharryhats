@@ -57,7 +57,7 @@ router.post(LOGIN_URL, (req, res) => {
                     throw Error("InvalidPassword")
                 }
                 req.session.user = user
-                req.query.redirect_uri = CALLBACK_URL
+                req.query.redirect_uri = '/api/auth' + CALLBACK_URL
                 return Auth.oauth_authorise(req, res);
             }
             throw Error("EmailNotFound");

@@ -16,6 +16,8 @@ function handleMongooseError(res, err, code) {
         // No matching email in user database
         res.status(code || 401).json({ "error": "Email not associated with a user" })
         break;
+      case 2:
+        res.status(code || 401).json({ "error": "Credentials invalid. Please provide a user and password or a session token." })
       case 4:
         res.status(code || 401).json({ "error": "No user with matching credentials" })
         break;
