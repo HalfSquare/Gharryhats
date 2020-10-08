@@ -37,7 +37,7 @@ router.get('/login', (req, res) => {
 // Default
 router.use('/', (req, res, next) => {
     // console.log(req.params);
-    getFile(req, res, './index.html');
+    getFile(req, res, './main/index.html');
 });
 
 

@@ -14,4 +14,4 @@ app.use('/auth', authRoutes);
 
 app.use('/', mainRoutes);
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
