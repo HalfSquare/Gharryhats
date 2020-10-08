@@ -1,48 +1,19 @@
 const express = require("express");
-const mongodb = require("mongodb");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
 
-const MongoClient = mongodb.MongoClient;
-const ObjectID = mongodb.ObjectID;
-
-const Auth = require('./auth/auth');
-const itemManager = require('./item');
-const config = require("./config/auth.config");
-const { User } = require('./models/user');
-const { Hat } = require("./models/hat");
-const { handleError, handleMongooseError } = require('./error/errorHandler');
-const { Error } = require('./error/CustomMongoError');
-const bcrypt = require('bcrypt');
-
-const AuthCode = require('./models/oAuth/authCode');
-const Client = require('./models/client');
-const Token = require('./models/oAuth/token');
-
-var cors = require('cors')
+const hatRoutes = require('./routing/hatRoutes');
+const authRoutes = require('./routing/authRoutes');
 
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 
-//TODO: remove
-const HATS_COLLECTION = 'hats';
-
-const HATS_URL = "/api/hats";
-const HAT_BY_ID_URL = "/api/hats/:id";
-const LOGIN_URL = "/api/auth/login";
-const SIGNUP_URL = "/api/auth/signup";
-const LOGOUT_URL = "/api/auth/logout";
-
-const OAUTH_CLIENTID = "e47532c3-3c2b-4e38-a534-8b709772e4a0";
-
 const app = express();
-app.use(cors());
 app.use(bodyParser.json());
 
 app.use(cookieParser());
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'sessGhatsSecret',
+  secret: process.env.SESSION_SECRET || 'anythingWeWant',
   resave: false,
   saveUninitialized: false
 }));
@@ -54,163 +25,10 @@ process.env.PORT = 8080;
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology: true, authMechanism: 'SCRAM-SHA-1' })
   .then(() => app.listen(process.env.PORT || 8080))
   .then(server => console.log("Running on port ", server.address().port))
-  // .then(connection => console.log('Now connected to MongoDB!\nUsing models:', connection.modelNames()))
   .catch(err => console.error('Something went wrong', err));
 
 
-// *** API ROUTES *** \\
 
-/*  "/api/hats"
- *    GET: finds all hats
- *    POST: creates a new hat
- */
+app.use('/api/auth', authRoutes);
 
-// GET
-app.get(HATS_URL, function (req, res) {
-  console.log("Recived GET request");
-
-  Hat.find({})
-    .then((hats) => res.status(200).json(hats))
-    .catch(err => handleError(res, err, "Error in finding hats"));
-
-});
-
-
-// POST
-app.post(HATS_URL, function (req, res) {
-  console.log("Recived POST request");
-
-  // Authenticate user
-  Auth.validateUser(req.headers)
-    .then(() => {
-      req.body.createDate = new Date();
-      return Hat(req.body).save();
-    })
-    .then(hat => res.status(201).send(hat))
-    .catch(err => handleMongooseError(res, err))
-});
-
-
-/*  "/api/hats/:id"
- *    GET: get hat by id
- *    PUT: update hat by id
- *    DELETE: delete hat by id
- */
-
-// GET
-app.get(HAT_BY_ID_URL, function (req, res) {
-  console.log("Recived GET:id request");
-
-  var id = req.params.id;
-
-  Hat.findById(id)
-    .then(user => res.status(user ? 200 : 404).json(user || {}))
-    .catch(err => handleMongooseError(res, err))
-});
-
-// PUT
-app.put(HAT_BY_ID_URL, function (req, res) {
-  console.log("Recived POST request");
-
-  let updateQuery = { _id: req.params.id }
-
-  // Authenticate user
-  Auth.validateUser(req.headers)
-    .then(() => Hat.updateOne(updateQuery, req.body))
-    .then(() => Hat.findById(req.params.id))
-    .then(update => res.status(200).send(update))
-    .catch(err => handleMongooseError(res, err))
-
-});
-
-
-// DELETE
-app.delete(HAT_BY_ID_URL, function (req, res) {
-  console.log("Recived DELETE request");
-
-  // Authenticate user
-  Auth.validateUser(req.headers)
-    .then(() => Hat.findById(req.params.id))
-    .then(user => {
-      if (!user) {
-        throw Error("HatNotFound")
-      }
-      return user.remove()
-    })
-    .then(deleted => res.status(200).send(deleted))
-    .catch(err => handleMongooseError(res, err))
-});
-
-/*  "/api/auth/"
- *    TODO
- *    TODO
- *    TODO
- */
-
-// SIGNUP
-app.post(SIGNUP_URL, async (req, res) => {
-  console.log("SIGN UP")
-
-  let password = req.body.password;
-  let BCRYPT_SALT_ROUNDS = 12;
-
-  //Check password complexity
-  if (Auth.isPasswordComplex(password)) {
-    bcrypt.hash(req.body.password, BCRYPT_SALT_ROUNDS)
-    .then(hashedPassword => {
-      req.body.password = hashedPassword;
-      // Making a new user ignores random junk in body
-      new User(req.body).save()
-      .then(user => res.status(201).send(user))
-    })
-    .catch(err => handleMongooseError(res, err));
-  } else {
-    handleMongooseError(res, Error("PasswordNotComplex"))
-  }
-
-  // Encrypt the password
-  
-
-});
-
-// LOGIN
-app.post(LOGIN_URL, (req, res) => {
-  console.log("login request recived");
-  var email = req.body.email;
-  var pass = req.body.password;
-
-  User.findOne({ email: email })
-    .then(user => {
-      if (user) {
-        var passIsValid = bcrypt.compareSync(pass, user.password);
-        if (!passIsValid) {
-          throw Error("InvalidPassword")
-        }
-        req.session.user = user
-        req.query.redirect_uri = "/callback"
-        return Auth.oauth_authorise(req, res);
-      }
-      throw Error("EmailNotFound");
-    })
-    .catch(err => handleMongooseError(res, err));
-});
-
-app.get('/callback', (req, res) => {
-  req.body.grant_type = "authorization_code";
-  console.log(req.query)
-  req.body.code = req.query.code;
-  req.body.client_id = OAUTH_CLIENTID;
-  return Auth.oauth_token(req, res);
-})
-
-// LOGOUT
-app.post(LOGOUT_URL, function (req, res) {
-});
-
-app.get('/oauth/authorise', function(req, res) {
-  return Auth.oauth_authorise(req, res);
-});
-
-app.post('/oauth/token', function (req, res) {
-  return Auth.oauth_token(req, res);
-});
+app.use('/api', hatRoutes);
