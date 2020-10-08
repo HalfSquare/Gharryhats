@@ -5,7 +5,7 @@ var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 const MongoClient = mongodb.MongoClient;
-var itemManager = require('./item');
+// var itemManager = require('./item');
 var HATS_COLLECTION = 'hats';
 
 var app = express();
