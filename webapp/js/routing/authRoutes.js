@@ -1,8 +1,9 @@
 const express = require('express');
+const getFile = require('../pageGetters/getFile');
 let router = express.Router();
 
 router.get("/login", (req, res, next) => {  
-    res.send("login");
+    getFile(req, res, './login/loginPage.html');
 });
 
 router.get("/signup", (req, res, next) => {

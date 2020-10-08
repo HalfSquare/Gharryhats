@@ -13,7 +13,7 @@ exports.showHats = function(hats){
         htmlString += '</a>';
         htmlString += "<p>" + hat.name + " for " + hat.animal + "</p>";
         htmlString += "<p>" + "$" + hat.price + "</p>";
-        htmlString += '<button type="button">Add to Cart</button>';
+        htmlString += '<button type="submit">Add to Cart</button>';
         htmlString += " </div>";
     });
 
@@ -35,7 +35,7 @@ exports.showHat = function(hatString){
     let hat = hatArray[0];
 
     htmlString += "<div id=item> ";
-    htmlString += '<img src="img/' + hat.imageUrl + '" alt="' + hat.name + '" height="300" width="300"></img>';
+    htmlString += '<img src="/img/' + hat.imageUrl + '" alt="' + hat.name + '" height="300" width="300"></img>';
     htmlString += "<p>" + hat.name + " for " + hat.animal + "</p>";
     htmlString += "<p>" + "$" + hat.price + "</p>";
     htmlString += '<button type="button">Add to Cart</button>';
