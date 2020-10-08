@@ -20,6 +20,8 @@ const AuthCode = require('./models/oAuth/authCode');
 const Client = require('./models/client');
 const Token = require('./models/oAuth/token');
 
+var cors = require('cors')
+
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 
@@ -32,7 +34,10 @@ const LOGIN_URL = "/api/auth/login";
 const SIGNUP_URL = "/api/auth/signup";
 const LOGOUT_URL = "/api/auth/logout";
 
+const OAUTH_CLIENTID = "e47532c3-3c2b-4e38-a534-8b709772e4a0";
+
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 app.use(cookieParser());
@@ -59,7 +64,6 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { 
  *    GET: finds all hats
  *    POST: creates a new hat
  */
-
 
 // GET
 app.get(HATS_URL, function (req, res) {
@@ -183,102 +187,30 @@ app.post(LOGIN_URL, (req, res) => {
           throw Error("InvalidPassword")
         }
         req.session.user = user
-        return res.redirect("/oauth/authorise");
+        req.query.redirect_uri = "/callback"
+        return Auth.oauth_authorise(req, res);
       }
       throw Error("EmailNotFound");
     })
     .catch(err => handleMongooseError(res, err));
 });
 
+app.get('/callback', (req, res) => {
+  req.body.grant_type = "authorization_code";
+  console.log(req.query)
+  req.body.code = req.query.code;
+  req.body.client_id = OAUTH_CLIENTID;
+  return Auth.oauth_token(req, res);
+})
+
 // LOGOUT
 app.post(LOGOUT_URL, function (req, res) {
 });
 
 app.get('/oauth/authorise', function(req, res) {
-  var responseType = req.query.response_type;
-  var clientId = req.query.client_id;
-  var redirectUri = req.query.redirect_uri;
-  var scope = req.query.scope;
-  var state = req.query.state;
-  if (!req.session || !req.session.user) {
-    // User is not logged in
-    // TODO direct to login page
-    return res.redirect(LOGIN_URL);
-  }
-
-  Client.findOne({
-    clientId: clientId
-  }, function (err, client) {
-    if (!client){
-      // TODO    
-    }
-    var authCode = new AuthCode({
-      clientId: clientId,
-      userId: req.session.user.id,
-      redirectUri: redirectUri
-    })
-    authCode.save()
-
-    var response = {
-      state: state,
-      code: authCode.code
-    };
-
-    if (redirectUri) {
-      var redirect = redirectUri +
-        '?code=' + response.code +
-        (state === undefined ? '' : '&state=' + state);
-      res.redirect(redirect);
-    } else {
-      res.json(response);
-    }
-  });
+  return Auth.oauth_authorise(req, res);
 });
 
 app.post('/oauth/token', function (req, res) {
-  var grantType = req.body.grant_type;
-  var authCode = req.body.code;
-  var redirectUri = req.body.redirect_uri; // TODO maybe?
-  var clientId = req.body.client_id;
-
-  if (grantType === 'authorization_code') {
-    AuthCode.findOne({
-      code: authCode
-    }, function(err, code) {
-      if (code) {
-        code.consumed = true;
-        code.save();
-
-        Client.findOne({
-          clientId: clientId
-        }, function(error, client) {
-
-          if (!client) {
-            // TODO
-          }
-
-          var refreshToken = jwt.sign({ id: req.session.user }, config.refresh_secret, { expiresIn: 86400 });
-          var accessToken = jwt.sign({ id: req.session.user }, config.access_secret, { expiresIn: 3600 });
-
-          req.session.accessToken = accessToken;
-
-          var token = new Token({
-            refreshToken: refreshToken,
-            accessToken: accessToken,
-            userId: code.userId
-          });
-          token.save();
-
-          var response = {
-            access_token: token.accessToken,
-            refresh_token: token.refreshToken,
-            expires_in: token.expiresIn,
-            token_type: token.tokenType
-          };
-
-          res.json(response);
-        });
-      }
-    });
-  }
+  return Auth.oauth_token(req, res);
 });
