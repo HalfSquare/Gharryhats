@@ -14,23 +14,30 @@ function signUpAction() {
 }
 
 function loginAction() {
-    let loginUrl = 'http://localhost:8080/api/auth/login'
+  console.log("Login press")
+    let loginUrl = 'http://localhost:3000/auth/login'
+    // let loginUrl = 'https://limitless-cove-65021.herokuapp.com/api/auth/login';
     let email = document.querySelector("#login").value
     let password = document.querySelector("#password").value
-    fetch(loginUrl, {
-        method: 'post',
-        headers: {
-            'Accept': 'application/json, text/plain, */*',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "email": email,
-            "password": password
-        })
-    })
-    .then(res=>res.json())
-    .then(res => console.log(res));
-    console.log(email)
-    console.log(password)
-    console.log("Login press")
+
+
+    var headers = new Headers();
+    headers.append('Content-Type', 'text/plain');
+    headers.append('Accept', 'application/json, text/plain, */*');
+    headers.append('email', email);
+    headers.append('password', password)
+
+
+    let requestOptions = {
+        method: 'POST',
+        headers: headers,
+        redirect: 'follow'
+    };
+
+    fetch(loginUrl, requestOptions)
+      .then(res=>res.json())
+      .then(res => console.log("login result", res))
+      .catch(err => console.log("error", err))
+    // console.log(email)
+    // console.log(password)
 }
