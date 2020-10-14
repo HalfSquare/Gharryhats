@@ -15,8 +15,8 @@ function signUpAction() {
 
 function loginAction() {
   console.log("Login press")
-    let loginUrl = 'http://localhost:8080/api/auth/login'
-    // let loginUrl = 'https://limitless-cove-65021.herokuapp.com/api/auth/login';
+    // let loginUrl = 'http://localhost:8080/api/auth/login'
+    let loginUrl = 'https://limitless-cove-65021.herokuapp.com/api/auth/login';
     let email = document.querySelector("#login").value
     let password = document.querySelector("#password").value
 
