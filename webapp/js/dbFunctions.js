@@ -39,7 +39,7 @@ exports.showHat = function(hatString){
     htmlString += "<p>" + hat.name + " for " + hat.animal + "</p>";
     htmlString += "<p>" + "$" + hat.price + "</p>";
     htmlString += '<button type="button">Add to Cart</button>';
-    htmlString += " </div> <p> Related </p> </div>";
+    htmlString += " </div> </div>";
     return htmlString;
 }
 
