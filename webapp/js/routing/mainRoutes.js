@@ -37,11 +37,8 @@ router.get('/hat/:hatid', async (req, res, next) => {
     await dbOp.getItem(req.params.hatid)
                 .then(hat => hatItem = hat)
                 .catch(err => getError(req, res, err));
-                //console.log('hatitem AFTER: ' + hatItem);
-    // await dbOp.getRelated(hatItem.animal)
-    //             .then(animal => getItem(req, res, './shop.html', hatItem, animal))
-    //             .catch(err => getError(req, res, err));
-    await dbOp.getItem(req.params.hatid)
+                console.log('hatitem AFTER: ', hatItem);
+    await dbOp.getRelated(hatItem[0].animal)
                 .then(animal => getItem(req, res, './shop.html', hatItem, animal))
                 .catch(err => getError(req, res, err));
 });

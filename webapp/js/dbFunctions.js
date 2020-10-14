@@ -51,8 +51,8 @@ exports.showRelated = function(related){
         htmlString += '<div id=relatedItem style="height:120px;width:120px;"> ';
         //console.log(hat);
         //console.log(hat._id);
-        htmlString += '<a href="/hat/' + related._id + '">';
-        htmlString += '<p style="float: left;"> <img src="img/' + related.imageUrl + '" alt="' + related.name + '" height="100" width="100"></img> </p>';
+        htmlString += '<a href="/hat/' + rel._id + '">';
+        htmlString += '<p style="float: left;"> <img src="/img/' + rel.imageUrl + '" alt="' + rel.name + '" height="100" width="100"></img> </p>';
         htmlString += '</a>';
         htmlString += " </div>";
     });

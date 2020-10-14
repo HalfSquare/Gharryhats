@@ -13,9 +13,8 @@ function getItem(req, res, filename, hat, related) {
         let hatBlock = dbFun.showHat(hat);
         let relatedBlock = dbFun.showRelated(related);
         let modified = data.toString().replace('<div id="emptyShopBlock"></div>', hatBlock);
-        let modified1 = data.toString().replace('<div id="emptyRelatedBlock"></div>', relatedBlock);
+        let modified1 = modified.toString().replace('<div id="emptyRelatedBlock"></div>', relatedBlock);
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.write(modified);
         res.write(modified1);
         return res.end();
     })
