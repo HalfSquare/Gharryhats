@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const LOGIN_URL = "/login";
 const SIGNUP_URL = "/signup";
 const LOGOUT_URL = "/logout";
+const GOOGLE_AUTHORISE = "/google"
 
 const CALLBACK_URL = "/callback";
 const OAUTH_AUTHERISE_URL = '/oauth/authorise';
@@ -42,6 +43,30 @@ router.post(SIGNUP_URL, async (req, res) => {
 
 
 });
+
+// SIGN IN WITH GOOGLE
+router.post(GOOGLE_AUTHORISE, async (req, res) => {
+    console.log("GOOGLE")
+    // Decode google id_token
+    let id = req.body.id_token;
+    let jwt = id.split(".")[1];
+    let userInfo = b64_to_utf8(jwt);
+    let json = JSON.parse(userInfo);
+    // Validate id_token
+    if (json.iss === 'https://accounts.google.com') {
+        // Check if user has account
+        User.findOne({ email: json.email })
+        .then(user => {
+            if (user) {
+                //TODO Authorise user
+            }
+            else {
+                //TODO Sign up user
+            }
+        })
+        .catch(err => handleMongooseError(res, err));
+    }
+})
 
 // LOGIN
 router.post(LOGIN_URL, (req, res) => {
