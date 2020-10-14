@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Gharryhats - Signup</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="design.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+    <div class="jumbotron text-center" style="margin-bottom:0">
+        <h1>Gharryhats</h1>
+        <p>Meeting all your pet's style needs!</p>
+    </div>
+
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <a class="navbar-brand" href="/">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/shop">Shop</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cart">
+                        <img src="/img/shoppingcart.png" alt="Shopping Cart" height="20" width="25">
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="align-items: center; align-self: center; align-content: center;">
+        <div id="signupContent">
+
+            <div id="signupInputContainer" class="container">
+                <h1 class="row">Signup</h1>
+                <div class="row">
+                    <input class="col" type="text" id="email" placeholder="Email">
+                    <p class="col-8" style="color: red;" id="emailValidText">You need to include an Email</p>
+                </div>
+                <div class="row">
+                    <input class="col" type="text" id="name" placeholder="Name">
+                    <p class="col-8" style="color: red;" id="nameValidText">You need to include a name</p>
+                </div>                
+                <div class="row">
+                    <input class="col" type="password" id="password" placeholder="Password">
+                    <p class="col-8" style="color: red;" id="passwordValidText">Please make your password more secure. Include at least one uppercase, one lowercase and one number. Make sure the password is 8 characters long.</p>
+                </div>
+                <div class="row">
+                    <input class="col" type="password" id="confirmPassword" placeholder="Confirm Password">
+                    <p class="col-8" style="color: red;" id="confirmPasswordValidText">Ensure this matches password</p>
+                </div>
+                <button class="row" id="signupButton">Signup</button>
+            </div>
+
+            <!-- <div id="formFooter">
+      <a id="signUp" href='/auth/signup'>Sign up</a>
+      <br>
+      <a id="forgotPassword" href='#'>Forgot Password?</a>
+    </div> -->
+
+        </div>
+    </div>
+
+    <div class="jumbotron text-center" style="margin-bottom:0">
+        <p>Footer</p>
+    </div>
+
+    <script id='signupScript'></script>
+
+</body>
+
+</html>
