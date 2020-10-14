@@ -44,21 +44,37 @@ exports.showHat = function(hatString){
 }
 
 exports.showRelated = function(related){
-    let htmlString = "<div id=relatedBlock> ";
+    if (related.length <= 0){
+        return "";
+    }
     let relatedArray = JSON.parse(JSON.stringify(related));
+    let htmlString = '<br><div class="relatedBlock"> <p> We see you\'re looking at ' + related[0].animal + ' hats - here\'s some related products you might enjoy! </p>';
+    let counter = 0;
+    htmlString += '<div class="row">';
 
     relatedArray.forEach(rel => {
-        htmlString += '<div id=relatedItem style="height:120px;width:120px;"> ';
+        if (counter == 5){
+            htmlString += '<div class="row">';
+        }
+        htmlString += '<div id=relatedItem style="height:120px;width:120px;padding:10px"> ';
+        htmlString += '<div class="col">';
         //console.log(hat);
         //console.log(hat._id);
         htmlString += '<a href="/hat/' + rel._id + '">';
         htmlString += '<p style="float: left;"> <img src="/img/' + rel.imageUrl + '" alt="' + rel.name + '" height="100" width="100"></img> </p>';
         htmlString += '</a>';
-        htmlString += " </div>";
+        htmlString += " </div></div>";
+        if (counter == 5){
+            htmlString += '</div>';
+            counter = 0;
+        }
+        else {
+            counter++;
+        }
     });
 
     //htmlString += "<p> Length: " + hatArray.length + "</p>";
 
-    htmlString += " </div>";
+    htmlString += " </div></div>";
     return htmlString;
 }
