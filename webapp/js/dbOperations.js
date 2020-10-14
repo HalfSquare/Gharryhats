@@ -67,3 +67,17 @@ exports.getUser = function() {
     console.log("Getting user");
     return 'undefined';
 }
+
+exports.getRelated = function(animal) {
+    let getRelated = new Promise((resolve, reject) => {
+        db.collection(HATS_COLLECTION).find({animal:(animal)}).toArray(function (err, docs) {
+            if (err) {
+                reject(docs);
+            } else {
+                console.log(docs);
+                resolve(docs);
+            }
+        });
+    }) 
+    return getRelated;
+}

@@ -39,6 +39,26 @@ exports.showHat = function(hatString){
     htmlString += "<p>" + hat.name + " for " + hat.animal + "</p>";
     htmlString += "<p>" + "$" + hat.price + "</p>";
     htmlString += '<button type="button">Add to Cart</button>';
-    htmlString += " </div></div>";
+    htmlString += " </div> <p> Related </p> </div>";
+    return htmlString;
+}
+
+exports.showRelated = function(related){
+    let htmlString = "<div id=relatedBlock> ";
+    let relatedArray = JSON.parse(JSON.stringify(related));
+
+    relatedArray.forEach(rel => {
+        htmlString += '<div id=relatedItem style="height:120px;width:120px;"> ';
+        //console.log(hat);
+        //console.log(hat._id);
+        htmlString += '<a href="/hat/' + related._id + '">';
+        htmlString += '<p style="float: left;"> <img src="img/' + related.imageUrl + '" alt="' + related.name + '" height="100" width="100"></img> </p>';
+        htmlString += '</a>';
+        htmlString += " </div>";
+    });
+
+    //htmlString += "<p> Length: " + hatArray.length + "</p>";
+
+    htmlString += " </div>";
     return htmlString;
 }
