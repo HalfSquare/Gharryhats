@@ -46,8 +46,11 @@ router.post(SIGNUP_URL, async (req, res) => {
 // LOGIN
 router.post(LOGIN_URL, (req, res) => {
     console.log("login request recived");
-    var email = req.body.email;
-    var pass = req.body.password;
+    var email = req.body.email ?? req.headers.email;
+    var pass = req.body.password ?? req.headers.password;
+
+    console.log("BODY***", req.body);
+    console.log("HEADERS***", req.headers);
 
     User.findOne({ email: email })
         .then(user => {
