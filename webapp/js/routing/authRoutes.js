@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const getFile = require('../pageGetters/getFile');
 const getLogin = require('../pageGetters/getLogin');
+const getSignup = require('../pageGetters/getSignup');
 let router = express.Router();
 
 router.get("/login", (req, res, next) => {
@@ -24,7 +25,12 @@ router.post("/login", cors(), (req, res) => {
 })
 
 router.get("/signup", (req, res, next) => {
-    res.send("signup");
+    getSignup(req, res, './signup/signupPage.html', './signup/js/signupController.js');
+});
+
+router.get("/signupDone", (req, res, next) => {
+    getFile(req, res, './signup/signupSuccessful.html')
+    // res.send("Sign Up Siccessful!");
 });
 
 router.use("/", (req, res, next) => {
