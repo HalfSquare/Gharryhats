@@ -26,9 +26,22 @@ router.get('/img/:image', (req, res, next) => {
 });
 
 // Get hat
-router.get('/hat/:hatid', (req, res, next) => {
-    dbOp.getItem(req.params.hatid)
-                .then(hat => getItem(req, res, './shop.html', hat))
+// router.get('/hat/:hatid', (req, res, next) => {
+//     dbOp.getItem(req.params.hatid)
+//                 .then(hat => getItem(req, res, './shop.html', hat))
+//                 .catch(err => getError(req, res, err));
+// });
+
+// Get hat
+router.get('/hat/:hatid', async (req, res, next) => {
+    let hatItem;
+    console.log('hatitem: ' + hatItem);
+    await dbOp.getItem(req.params.hatid)
+                .then(hat => hatItem = hat)
+                .catch(err => getError(req, res, err));
+                console.log('hatitem AFTER: ', hatItem);
+    await dbOp.getRelated(hatItem[0].animal)
+                .then(animal => getItem(req, res, './shop.html', hatItem, animal))
                 .catch(err => getError(req, res, err));
 });
 

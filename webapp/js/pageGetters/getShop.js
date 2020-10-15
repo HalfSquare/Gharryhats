@@ -10,7 +10,7 @@ function getShop(req, res, filename, hats) {
         }
         //console.log(data.toString());
         let hatBlock = dbFun.showHats(hats);
-        let modified = data.toString().replace("<p>Hi there</p>", hatBlock);
+        let modified = data.toString().replace('<div id="emptyShopBlock"></div>', hatBlock);
         res.writeHead(200, { 'Content-Type': 'text/html' });
         res.write(modified);
         return res.end();
