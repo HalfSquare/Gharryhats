@@ -3,23 +3,26 @@ const e = require("express");
 exports.showHats = function(hats){
     let htmlString = "<div id=shopBlock> ";
     let hatArray = JSON.parse(JSON.stringify(hats));
+    htmlString += '<div class="row">';
 
     hatArray.forEach(hat => {
-        htmlString += '<div id=shopItem style="height:220px;width:400px;"> ';
+        htmlString += '<div class="col">';
+        htmlString += '<div id=shopItem style="height:220px;width:450px;"> ';
         //console.log(hat);
         //console.log(hat._id);
         htmlString += '<a href="/hat/' + hat._id + '">';
         htmlString += '<p style="float: left;"> <img src="img/' + hat.imageUrl + '" alt="' + hat.name + '" height="200" width="200"></img> </p>';
         htmlString += '</a>';
+        htmlString += '<div id=shopText style="margin-left:220px;"> '
         htmlString += "<p>" + hat.name + " for " + hat.animal + "</p>";
         htmlString += "<p>" + "$" + hat.price + "</p>";
         htmlString += '<button type="submit">Add to Cart</button>';
-        htmlString += " </div>";
+        htmlString += " </div> </div> </div>";
     });
 
     //htmlString += "<p> Length: " + hatArray.length + "</p>";
 
-    htmlString += " </div>";
+    htmlString += " </div></div>";
     return htmlString;
 }
 
@@ -49,13 +52,9 @@ exports.showRelated = function(related){
     }
     let relatedArray = JSON.parse(JSON.stringify(related));
     let htmlString = '<br><div class="relatedBlock"> <p> We see you\'re looking at ' + related[0].animal + ' hats - here\'s some related products you might enjoy! </p>';
-    let counter = 0;
     htmlString += '<div class="row">';
 
     relatedArray.forEach(rel => {
-        if (counter == 5){
-            htmlString += '<div class="row">';
-        }
         htmlString += '<div id=relatedItem style="height:120px;width:120px;padding:10px"> ';
         htmlString += '<div class="col">';
         //console.log(hat);
@@ -64,13 +63,6 @@ exports.showRelated = function(related){
         htmlString += '<p style="float: left;"> <img src="/img/' + rel.imageUrl + '" alt="' + rel.name + '" height="100" width="100"></img> </p>';
         htmlString += '</a>';
         htmlString += " </div></div>";
-        if (counter == 5){
-            htmlString += '</div>';
-            counter = 0;
-        }
-        else {
-            counter++;
-        }
     });
 
     //htmlString += "<p> Length: " + hatArray.length + "</p>";
