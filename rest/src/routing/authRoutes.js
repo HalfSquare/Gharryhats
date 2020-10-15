@@ -126,6 +126,7 @@ router.get(CALLBACK_URL, (req, res) => {
     req.body.grant_type = "authorization_code";
     req.body.code = req.query.code;
     req.body.client_id = OAUTH_CLIENTID;
+    req.body.user_id = req.query.userid;
     return Auth.oauth_token(req, res);
 })
 

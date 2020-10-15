@@ -8,9 +8,11 @@ function getCart(req, res, filename, cart) {
             res.writeHead(404, { 'Content-Type': 'text/html' });
             return res.end('404 not found');
         }
-        if (cart != 'undefined') {
-            dbFun.showCartItems(cart)
-            console.log("well something happened");
+        if (cart) {
+            let modified = data.toString().replace("<p>Loading...</p>", "");
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.write(modified);
+            return res.end();
         }
         else {
             let modified = data.toString().replace("<p>Loading...</p>", "It looks like you're not signed in - login now to view your cart!");

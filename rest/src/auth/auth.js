@@ -83,7 +83,8 @@ function oauth_authorise(req, res) {
     if (redirectUri) {
       var redirect = redirectUri +
         '?code=' + response.code +
-        (state === undefined ? '' : '&state=' + state);
+        (state === undefined ? '' : '&state=' + state)
+        + '&userid=' + req.session.user.id;
       res.redirect(redirect);
     } else {
       res.json(response);
@@ -96,6 +97,7 @@ async function oauth_token(req, res) {
   var authCode = req.body.code;
   var redirectUri = req.body.redirect_uri; // TODO maybe?
   var clientId = req.body.client_id;
+  var userId = req.body.user_id;
 
   if (grantType === 'authorization_code') {
     AuthCode.findOne({
@@ -116,8 +118,8 @@ async function oauth_token(req, res) {
             // TODO
           }
 
-          var refreshToken = jwt.sign({ id: req.session.user }, config.refresh_secret, { expiresIn: 86400 });
-          var accessToken = jwt.sign({ id: req.session.user }, config.access_secret, { expiresIn: 3600 });
+          var refreshToken = jwt.sign({"userid":userId}, config.refresh_secret, { expiresIn: 86400 });
+          var accessToken = jwt.sign({"userid":userId}, config.access_secret, { expiresIn: 3600 });
 
           req.session.accessToken = accessToken;
 

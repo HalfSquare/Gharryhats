@@ -4,6 +4,9 @@ const { handleError, handleMongooseError } = require("../error/errorHandler");
 const Auth = require("../auth/auth");
 const HATS_URL = "/hats";
 const HAT_BY_ID_URL = "/hats/:id";
+const config = require('../config/auth.config');
+
+const jwt = require('jsonwebtoken');
 
 const express = require("express");
 let router = express.Router();
@@ -76,13 +79,31 @@ router.delete(HAT_BY_ID_URL, function (req, res) {
 
 router.get("/cart", function (req, res) {
   Auth.validateUser(req.headers).then(() => {
-    let id = req.body.userId; // TODO
-    Cart.findOne({ userId: id }).then((cart) => {
-      if (cart) {
-        res.status(200).json(cart.items);
+    jwt.verify(req.headers.token, config.access_secret, (err, decoded) => {
+      if (!err) {
+        let userid = decoded.userid
+        Cart.find({ userId: userid }).then((cart) => {
+          res.writeHead(200, {'Content-Type': 'application/json'}) 
+          res.write(JSON.stringify(cart ? cart[0].items ?? [] : []));
+          res.end();
+        });
       }
-    });
+      else {
+        console.log(err)
+      }
+    })
+   
   });
 });
+
+function parseJwt (token) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+
+  return JSON.parse(jsonPayload);
+};
 
 module.exports = router;
