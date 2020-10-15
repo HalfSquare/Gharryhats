@@ -49,7 +49,7 @@ const CLIENT_SECRET = "D2nxKX_rC0k60pxtO3g4xu8Y";
 const REDIRECT_URI = "http://localhost:3000/google/callback"; //TODO Update to heroku uri
 const RESPONSE_TYPE = "id_token";
 const STATE = "LKJSAKL";
-const SCOPE = "openid email";
+const SCOPE = "openid profile email";
 const PROMPT = "consent";
 
 function create_google_oauth_url() {

@@ -3,6 +3,7 @@ const { User } = require('../models/user');
 const { handleMongooseError } = require('../error/errorHandler');
 const { Error } = require('../error/CustomMongoError');
 const bcrypt = require('bcrypt');
+var uuid = require('node-uuid');
 
 const LOGIN_URL = "/login";
 const SIGNUP_URL = "/signup";
@@ -48,20 +49,31 @@ router.post(SIGNUP_URL, async (req, res) => {
 router.post(GOOGLE_AUTHORISE, async (req, res) => {
     console.log("GOOGLE")
     // Decode google id_token
-    let id = req.body.id_token;
+    let id = req.headers.id_token;
     let jwt = id.split(".")[1];
-    let userInfo = b64_to_utf8(jwt);
+    let userInfo = Buffer.from(jwt, 'base64').toString('binary');
+    console.log(userInfo);
     let json = JSON.parse(userInfo);
+    let email = json.email;
+    let name = json.name;
+    let googleID = uuid.v4();
     // Validate id_token
     if (json.iss === 'https://accounts.google.com') {
         // Check if user has account
         User.findOne({ email: json.email })
         .then(user => {
             if (user) {
-                //TODO Authorise user
+                req.session.user = user
+                req.query.redirect_uri = '/api/auth' + CALLBACK_URL
+                Auth.oauth_authorise(req, res);
             }
             else {
-                //TODO Sign up user
+                new User({ email: email, name: name, googleID: googleID }).save()
+                .then(user => {
+                    req.session.user = user
+                    req.query.redirect_uri = '/api/auth' + CALLBACK_URL
+                    Auth.oauth_authorise(req, res);
+                })
             }
         })
         .catch(err => handleMongooseError(res, err));
@@ -95,7 +107,6 @@ router.post(LOGIN_URL, (req, res) => {
 
 router.get(CALLBACK_URL, (req, res) => {
     req.body.grant_type = "authorization_code";
-    console.log(req.query)
     req.body.code = req.query.code;
     req.body.client_id = OAUTH_CLIENTID;
     return Auth.oauth_token(req, res);
