@@ -11,7 +11,7 @@ var session = require('express-session');
 
 const whitelist = [
   'https://limitless-cove-65021.herokuapp.com', 
-  'https://gharryats.herokuapp.com',
+  'https://gharryhats.herokuapp.com',
   'http://localhost:3000',
   'http://localhost:8080',
 ];
@@ -39,8 +39,8 @@ app.use(session({
 }));
 
 // For accessing the live database locally
-process.env.MONGODB_URI = "mongodb+srv://herokuRestNode:KnND571lRn10cZDk@nwen304-shop-db.f9hmb.mongodb.net/store?retryWrites=true&w=1";
-process.env.PORT = 8080;
+// process.env.MONGODB_URI = "mongodb+srv://herokuRestNode:KnND571lRn10cZDk@nwen304-shop-db.f9hmb.mongodb.net/store?retryWrites=true&w=1";
+// process.env.PORT = 8080;
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { useNewUrlParser: true, useUnifiedTopology: true, authMechanism: 'SCRAM-SHA-1' })
   .then(() => app.listen(process.env.PORT || 8080))
