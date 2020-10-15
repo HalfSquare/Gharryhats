@@ -23,7 +23,7 @@
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="collapsibleNavbar">
-    <ul class="navbar-nav">
+    <ul class="navbar-nav mr-auto">
       <li class="nav-item">
         <a class="nav-link" href="/shop">Shop</a>
       </li>
@@ -36,6 +36,9 @@
         </a>
       </li>    
     </ul>
+    <a id="logoutButton" class="navbar-link" href="/">
+      Logout
+    </a>
   </div>  
 </nav>
 
@@ -88,6 +91,8 @@
   <p>Footer</p>
 </div>
 
+<script src="/js/cookies.js"></script>
+
 <script>
   window.addEventListener("load", init);
   
@@ -100,23 +105,14 @@
 
     document.getElementById('loginLink').textContent = loggedIn ? name : 'Login';
 
+    let logoutButton = document.getElementById('logoutButton')
+    logoutButton.style.visibility = loggedIn ? 'visible' : 'hidden';
+    logoutButton.addEventListener('click', () => { logout(); });
+
   }
 
 
-  function getCookie(cookie) {
-    var name = cookie + "=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
+  
 </script>
 
 </body>
