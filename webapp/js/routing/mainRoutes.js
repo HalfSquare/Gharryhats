@@ -36,8 +36,8 @@ router.get('/cart', (req, res) => {
     let id = "" //TODO get id from cookie
     dbOp.getCart(id).then(cart => {
         console.log(cart.items);
+        getCart(req, res, './cart.html', cart); 
     })
-    getCart(req, res, './cart.html', 'undefined'); 
 });
 
 // Login redirect

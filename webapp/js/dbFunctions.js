@@ -23,6 +23,13 @@ exports.showHats = function(hats){
     return htmlString;
 }
 
+exports.showCartItems = function(cart) {
+    cart.items.forEach(item => {
+        console.log(item)
+    })
+    return ""
+}
+
 exports.showHat = function(hatString){
     let htmlString = "<div id=shopBlock> ";
     //let hatArray = JSON.parse(JSON.stringify(hat));
