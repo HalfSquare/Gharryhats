@@ -66,6 +66,7 @@ async function signupAction() {
 
         if (response.ok) {
             console.log('ok!')
+            document.location.href = '/auth/signupDone';
         } else {
             console.log('no:', response.status);
             passwordValid = false;

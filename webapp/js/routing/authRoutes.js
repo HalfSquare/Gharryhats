@@ -28,6 +28,11 @@ router.get("/signup", (req, res, next) => {
     getSignup(req, res, './signup/signupPage.html', './signup/js/signupController.js');
 });
 
+router.get("/signupDone", (req, res, next) => {
+    getFile(req, res, './signup/signupSuccessful.html')
+    // res.send("Sign Up Siccessful!");
+});
+
 router.use("/", (req, res, next) => {
     res.redirect("/auth/login");
 })
