@@ -1,5 +1,6 @@
 const Auth = require('../auth/auth');
 const { User } = require('../models/user');
+const { Cart } = require('../models/cart');
 const { handleMongooseError } = require('../error/errorHandler');
 const { Error } = require('../error/CustomMongoError');
 const bcrypt = require('bcrypt');
@@ -19,6 +20,10 @@ const OAUTH_CLIENTID = "e47532c3-3c2b-4e38-a534-8b709772e4a0";
 const express = require('express');
 let router = express.Router();
 
+function create_cart(user) {
+    new Cart({userId: user.id, items: []}).save()
+}
+
 // SIGNUP
 router.post(SIGNUP_URL, async (req, res) => {
     console.log("SIGN UP")
@@ -33,7 +38,10 @@ router.post(SIGNUP_URL, async (req, res) => {
                 req.body.password = hashedPassword;
                 // Making a new user ignores random junk in body
                 new User(req.body).save()
-                    .then(user => res.status(201).send(user))
+                    .then(user => {
+                        create_cart(user)
+                        res.status(201).send(user)
+                    })
             })
             .catch(err => handleMongooseError(res, err));
     } else {
@@ -72,6 +80,7 @@ router.post(GOOGLE_AUTHORISE, async (req, res) => {
                 .then(user => {
                     req.session.user = user
                     req.query.redirect_uri = '/api/auth' + CALLBACK_URL
+                    create_cart(user)
                     Auth.oauth_authorise(req, res);
                 })
             }

@@ -33,10 +33,10 @@ router.get('/hat/:hatid', (req, res, next) => {
 
 // Get cart
 router.get('/cart', (req, res) => {
-    // dbOp.getUser()
-    //             .then(user => getCart(req, res, './cart.html', user))
-    //             .catch(err => getError(req, res, err));
-    dbOp.getUser();
+    let id = "" //TODO get id from cookie
+    dbOp.getCart(id).then(cart => {
+        console.log(cart.items);
+    })
     getCart(req, res, './cart.html', 'undefined'); 
 });
 

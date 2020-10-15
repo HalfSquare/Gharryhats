@@ -102,6 +102,9 @@ function oauth_token(req, res) {
       code: authCode
     }, function(err, code) {
       if (code) {
+        if (code.consumed) {
+          //TODO Cancel code has already been used
+        }
         code.consumed = true;
         code.save();
 

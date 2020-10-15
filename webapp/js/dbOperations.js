@@ -7,6 +7,7 @@ var ObjectID = mongodb.ObjectID;
 const MongoClient = mongodb.MongoClient;
 // var itemManager = require('./item');
 var HATS_COLLECTION = 'hats';
+var CARTS_COLLECTION = 'carts';
 
 var app = express();
 app.use(bodyParser.json());
@@ -45,6 +46,20 @@ exports.getAll = function() {
         });
     }) 
     return getHats;
+}
+
+exports.getCart = function(id) {
+    let getCart = new Promise((resolve, reject) => {
+        db.collection(CARTS_COLLECTION).find({userId: id}).toArray(function (err, docs) {
+            if (err) {
+                reject(docs);
+            } else {
+                console.log(docs);
+                resolve(docs);
+            }
+        });
+    }) 
+    return getCart;
 }
 
 exports.getItem = function(id) {

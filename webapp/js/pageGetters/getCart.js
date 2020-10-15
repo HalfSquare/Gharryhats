@@ -1,14 +1,15 @@
 const fs = require('fs');
 const dbFun = require('../dbFunctions');
 
-function getCart(req, res, filename, user) {
+function getCart(req, res, filename, cart) {
     fs.readFile(filename, function (error, data) {
         if (error) {
             console.log(error);
             res.writeHead(404, { 'Content-Type': 'text/html' });
             return res.end('404 not found');
         }
-        if (user != 'undefined'){
+        if (cart != 'undefined') {
+            dbFun.showCartItems(cart)
             console.log("well something happened");
         }
         else {
