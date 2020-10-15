@@ -8,6 +8,7 @@ const getImg = require('../pageGetters/getImg');
 const getError = require('../pageGetters/getError');
 const getCart = require('../pageGetters/getCart');
 const getLogin = require('../pageGetters/getLogin');
+const getJs = require('../pageGetters/getJs');
 
 // Define the router
 let router = express.Router();
@@ -50,6 +51,10 @@ const GOOGLE_OAUTH_CALLBACK = "/google/callback";
 router.use(GOOGLE_OAUTH_CALLBACK, (req, res) => {
     getLogin(req, res, './login/googleAuthLoginPage.html', './login/js/googleAuthLoginController.js');
 });
+
+router.get('/js/cookies.js', (req, res) => {
+    getJs(req, res, './js/cookies.js');
+})
 
 // Default
 router.use('/', (req, res, next) => {
