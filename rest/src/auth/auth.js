@@ -91,7 +91,7 @@ function oauth_authorise(req, res) {
   });
 }
 
-function oauth_token(req, res) {
+async function oauth_token(req, res) {
   var grantType = req.body.grant_type;
   var authCode = req.body.code;
   var redirectUri = req.body.redirect_uri; // TODO maybe?
@@ -100,14 +100,14 @@ function oauth_token(req, res) {
   if (grantType === 'authorization_code') {
     AuthCode.findOne({
       code: authCode
-    }, function(err, code) {
+    }, async function(err, code) {
       if (code) {
         code.consumed = true;
         code.save();
 
         Client.findOne({
           clientId: clientId
-        }, function(error, client) {
+        }, async function(error, client) {
 
           if (!client) {
             // TODO
@@ -125,11 +125,15 @@ function oauth_token(req, res) {
           });
           token.save();
 
+          console.log('userId', code.userId)
+          let user = await User.find({_id: ObjectId(code.userId)});
+          console.log('user', user[0].name)
           var response = {
             access_token: token.accessToken,
             refresh_token: token.refreshToken,
             expires_in: token.expiresIn,
-            token_type: token.tokenType
+            token_type: token.tokenType,
+            name: user[0].name
           };
           
           res.json(response);
@@ -140,6 +144,7 @@ function oauth_token(req, res) {
 }
 
 var Token = require('../models/oAuth/token');
+const { ObjectId } = require('mongodb');
 
 var authorize = function(req, res, next) {
   var accessToken;

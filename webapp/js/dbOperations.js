@@ -7,6 +7,7 @@ var ObjectID = mongodb.ObjectID;
 const MongoClient = mongodb.MongoClient;
 // var itemManager = require('./item');
 var HATS_COLLECTION = 'hats';
+var USERS_COLLECTION = 'users';
 
 var app = express();
 app.use(bodyParser.json());
@@ -61,6 +62,21 @@ exports.getItem = function(id) {
     }) 
     return getHat;
 }
+
+// exports.getNameFromEmail = function(email) {
+//     console.log("email", email);
+//     let getName = new Promise((res, rej) => {
+//         db.collection(USERS_COLLECTION).find({'email': email}).toArray(function (err, docs) {
+//             if (err) {
+//                 rej(docs);
+//             } else {
+//                 console.log(docs);
+//                 res(docs);
+//             }
+//         });
+//     });
+//     return getName;
+// }
 
 exports.getUser = function() {
     //TO-DO

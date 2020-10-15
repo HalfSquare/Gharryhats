@@ -28,8 +28,24 @@ function validate_google_user(id_token) {
             let accessToken = res.access_token;
             let refreshToken = res.refresh_token;
             if (accessToken) {
-                // TODO route to main page
+                console.log("token", accessToken)
+                
+                setCookie([['name', res.name]]);
+                setCookie([['token', accessToken]]);
+                document.location.href = '/';
             }
         })
       .catch(err => console.log("error", err))
+}
+
+function setCookie(cookieValues) {
+    var d = new Date();
+    d.setTime(d.getTime() + (60 * 60 * 1000));
+    var expires = "expires=" + d.toUTCString();
+
+    let cookies = "";
+    cookieValues.forEach(item => {
+        cookies = cookies + item[0] + '=' + item[1] + ';';
+        document.cookie = cookies + expires + ";path=/";
+    });
 }
