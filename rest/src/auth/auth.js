@@ -55,7 +55,6 @@ function oauth_authorise(req, res) {
   var redirectUri = req.query.redirect_uri;
   var scope = req.query.scope;
   var state = req.query.state;
-  console.log(req.session)
   if (!req.session || !req.session.user) {
     // User is not logged in
     // TODO direct to login page
