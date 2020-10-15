@@ -12,7 +12,7 @@ dbOp.connect();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({
     origin: function (origin, callback) {
-        console.log('origin', origin);
+        // console.log('origin', origin);
         // allow requests with no origin 
         if (!origin) return callback(null, true);
         if (whitelist.indexOf(origin) === -1) {
@@ -30,4 +30,4 @@ app.use('/auth', authRoutes);
 app.use('/', mainRoutes);
 
 app.listen(process.env.PORT || 3000);
-console.log("started");
+console.log("Hosted on port ", process.env.PORT || 3000);

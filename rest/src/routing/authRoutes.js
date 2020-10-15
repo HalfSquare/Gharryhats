@@ -23,16 +23,24 @@ let router = express.Router();
 router.post(SIGNUP_URL, async (req, res) => {
     console.log("SIGN UP")
 
-    let password = req.body.password;
+    let body = {};
+
+    body.email = req.body.email || req.headers.email;
+    body.name = req.body.name || req.headers.name;
+    body.password = req.body.password || req.headers.password;
+
+    console.log("body", body)
+
+    let password = body.password;
     let BCRYPT_SALT_ROUNDS = 12;
 
     //Check password complexity
     if (Auth.isPasswordComplex(password)) {
-        bcrypt.hash(req.body.password, BCRYPT_SALT_ROUNDS)
+        bcrypt.hash(body.password, BCRYPT_SALT_ROUNDS)
             .then(hashedPassword => {
-                req.body.password = hashedPassword;
+                body.password = hashedPassword;
                 // Making a new user ignores random junk in body
-                new User(req.body).save()
+                new User(body).save()
                     .then(user => res.status(201).send(user))
             })
             .catch(err => handleMongooseError(res, err));
