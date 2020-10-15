@@ -83,8 +83,9 @@ router.get("/cart", function (req, res) {
       if (!err) {
         let userid = decoded.userid
         Cart.find({ userId: userid }).then((cart) => {
-          res.writeHead(200, {'Content-Type': 'application/json'}) 
-          res.write(JSON.stringify(cart ? cart[0].items ?? [] : []));
+          res.writeHead(200, {'Content-Type': 'application/json'})
+          console.log('CART:', cart); 
+          res.write(JSON.stringify(cart[0] ? cart[0].items ?? [] : []));
           res.end();
         });
       }

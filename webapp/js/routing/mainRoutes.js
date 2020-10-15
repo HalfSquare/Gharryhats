@@ -9,7 +9,7 @@ const getError = require("../pageGetters/getError");
 const getCart = require("../pageGetters/getCart");
 const getLogin = require("../pageGetters/getLogin");
 const getJs = require("../pageGetters/getJs");
-const token = require("../../../rest/src/models/oAuth/token");
+// const token = require("../../../rest/src/models/oAuth/token");
 
 const fetch = require("node-fetch");
 
@@ -66,8 +66,8 @@ router.get("/cart", async (req, res) => {
     }
   }
   if (token) {
-    // let signupUrl = 'https://limitless-cove-65021.herokuapp.com/api/auth/signup';
-    let cartUrl = "http://localhost:8080/api/cart";
+    let cartUrl = 'https://limitless-cove-65021.herokuapp.com/api/cart';
+    // let cartUrl = "http://localhost:8080/api/cart";
     var headers = {
       "Content-Type": "applocation/json",
       Accept: "application/json, text/plain, */*",
@@ -82,11 +82,11 @@ router.get("/cart", async (req, res) => {
 
     let response;
     await fetch(cartUrl, requestOptions)
-      .then((res) => {
-        response = res;
-        return res.json();
+      .then((result) => {
+        response = result;
+        return result.json();
       })
-      .then((res) => getCart(req, res, './cart.html', res))
+      .then((result) => getCart(req, res, './cart.html', result))
       .catch((err) => console.log("error", err));
   } else {
     getCart(req, res, "./cart.html");

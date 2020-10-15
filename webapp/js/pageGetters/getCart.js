@@ -9,12 +9,39 @@ function getCart(req, res, filename, cart) {
             return res.end('404 not found');
         }
         if (cart) {
-            let modified = data.toString().replace("<p>Loading...</p>", "");
+            let cartHtml;
+            if (cart.length > 0) {
+                cartHtml = `
+                <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Item</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Delete</th>
+                    </tr>
+                    </thead><tbody>`
+
+                cart.foreach(item => {
+                    cartHtml += `
+                        <tr>
+                        <th scope="row"></th>
+                        <td>${JSON.stringify(item)}</td>
+                        <td>1</td>
+                        <td><button>Delete</button></td>
+                        </tr>
+                        `;
+                })
+                cartHtml += `</tbody></table>`
+            } else {
+                cartHtml = "<p>No Items in Cart</p>"
+            }
+
+            let modified = data.toString().replace("<p>Loading...</p>", cartHtml);
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.write(modified);
             return res.end();
-        }
-        else {
+        } else {
             let modified = data.toString().replace("<p>Loading...</p>", "It looks like you're not signed in - login now to view your cart!");
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.write(modified);

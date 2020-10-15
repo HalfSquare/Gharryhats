@@ -35,8 +35,8 @@ function init(){
 async function signupAction() {
     console.log("signup!")
 
-    // let signupUrl = 'https://limitless-cove-65021.herokuapp.com/api/auth/signup';
-    let signupUrl = 'http://localhost:8080/api/auth/signup';
+    let signupUrl = 'https://limitless-cove-65021.herokuapp.com/api/auth/signup';
+    // let signupUrl = 'http://localhost:8080/api/auth/signup';
 
     emailValid = !!email.value;
     nameValid = !!name.value;
