@@ -27,8 +27,8 @@
       <li class="nav-item">
         <a class="nav-link" href="/shop">Shop</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/login">Login</a>
+      <li class="nav-item" >
+        <a class="nav-link" id="loginLink" href="/login">Login</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/cart">
@@ -87,6 +87,37 @@
 <div class="jumbotron text-center" style="bottom:0; margin-bottom: 0; width: 100%;"">
   <p>Footer</p>
 </div>
+
+<script>
+  window.addEventListener("load", init);
+  
+  function init() {
+    let loggedIn = !!getCookie("token");
+    let name = getCookie("name");
+
+    console.log("is logged in ", loggedIn);
+    console.log("name ", name);
+
+    document.getElementById('loginLink').textContent = loggedIn ? name : 'Login';
+
+  }
+
+
+  function getCookie(cookie) {
+    var name = cookie + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+</script>
 
 </body>
 </html>
