@@ -5,8 +5,10 @@ var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var ObjectID = mongodb.ObjectID;
 const MongoClient = mongodb.MongoClient;
-var itemManager = require('./item');
+// var itemManager = require('./item');
 var HATS_COLLECTION = 'hats';
+var CARTS_COLLECTION = 'carts';
+var USERS_COLLECTION = 'users';
 
 var app = express();
 app.use(bodyParser.json());
@@ -47,6 +49,20 @@ exports.getAll = function() {
     return getHats;
 }
 
+exports.getCart = function(id) {
+    let getCart = new Promise((resolve, reject) => {
+        db.collection(CARTS_COLLECTION).find({userId: id}).toArray(function (err, docs) {
+            if (err) {
+                reject(docs);
+            } else {
+                console.log(docs);
+                resolve(docs);
+            }
+        });
+    }) 
+    return getCart;
+}
+
 exports.getItem = function(id) {
     console.log(id);
     let getHat = new Promise((resolve, reject) => {
@@ -60,4 +76,25 @@ exports.getItem = function(id) {
         });
     }) 
     return getHat;
+}
+
+// exports.getNameFromEmail = function(email) {
+//     console.log("email", email);
+//     let getName = new Promise((res, rej) => {
+//         db.collection(USERS_COLLECTION).find({'email': email}).toArray(function (err, docs) {
+//             if (err) {
+//                 rej(docs);
+//             } else {
+//                 console.log(docs);
+//                 res(docs);
+//             }
+//         });
+//     });
+//     return getName;
+// }
+
+exports.getUser = function() {
+    //TO-DO
+    console.log("Getting user");
+    return 'undefined';
 }

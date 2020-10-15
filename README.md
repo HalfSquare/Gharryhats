@@ -12,7 +12,7 @@ This project consists of a web application consisting of a front-end and back-en
 - [x] Dynamic Endpoints
 - [x] Client Side JS
 - [ ] OAuth/OpenID
-- [ ] Host on Cloud
+- [x] Host on Cloud
 - [x] MVC Architecture
 
 ## API

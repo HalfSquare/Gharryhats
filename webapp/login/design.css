@@ -27,7 +27,7 @@ a {
 #loginContent {
   -webkit-border-radius: 10px 10px 10px 10px;
   border-radius: 10px 10px 10px 10px;
-  background: #fff;
+  background: red;
   width: 90%;
   max-width: 450px;
   position: relative;
@@ -39,6 +39,8 @@ a {
 
 #loginInputContainer {
   margin-top: 20px;
+  margin-left: 20px;
+  background-color: red;
 }
 
 #loginContent button {

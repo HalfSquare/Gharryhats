@@ -1,4 +1,6 @@
 const { User } = require('../models/user');
+const Client = require('../models/client');
+const AuthCode = require('../models/oAuth/authCode');
 const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config');
 const { Error } = require('../error/CustomMongoError');
@@ -23,7 +25,7 @@ const validateUser = function (email, pass, token) {
   // Token validation
   if (token) {
     return new Promise((resolve, reject) => {
-      jwt.verify(token, config.secret, (err, decoded) => {
+      jwt.verify(token, config.access_secret, (err, decoded) => {
         if (err) {
           reject(Error("ValidationError"));
         }
@@ -47,7 +49,107 @@ const validateUser = function (email, pass, token) {
   }
 }
 
+function oauth_authorise(req, res) {
+  var responseType = req.query.response_type;
+  var clientId = req.query.client_id;
+  var redirectUri = req.query.redirect_uri;
+  var scope = req.query.scope;
+  var state = req.query.state;
+  if (!req.session || !req.session.user) {
+    // User is not logged in
+    // TODO direct to login page
+    console.log("user not logged in");
+    return res.redirect(LOGIN_URL);
+  }
+
+  Client.findOne({
+    clientId: clientId
+  }, function (err, client) {
+    if (!client){
+      // TODO    
+    }
+    var authCode = new AuthCode({
+      clientId: clientId,
+      userId: req.session.user.id,
+      redirectUri: redirectUri
+    })
+    authCode.save()
+
+    var response = {
+      state: state,
+      code: authCode.code
+    };
+
+    if (redirectUri) {
+      var redirect = redirectUri +
+        '?code=' + response.code +
+        (state === undefined ? '' : '&state=' + state)
+        + '&userid=' + req.session.user.id;
+      res.redirect(redirect);
+    } else {
+      res.json(response);
+    }
+  });
+}
+
+async function oauth_token(req, res) {
+  var grantType = req.body.grant_type;
+  var authCode = req.body.code;
+  var redirectUri = req.body.redirect_uri; // TODO maybe?
+  var clientId = req.body.client_id;
+  var userId = req.body.user_id;
+
+  if (grantType === 'authorization_code') {
+    AuthCode.findOne({
+      code: authCode
+    }, async function(err, code) {
+      if (code) {
+        if (code.consumed) {
+          //TODO Cancel code has already been used
+        }
+        code.consumed = true;
+        code.save();
+
+        Client.findOne({
+          clientId: clientId
+        }, async function(error, client) {
+
+          if (!client) {
+            // TODO
+          }
+
+          var refreshToken = jwt.sign({"userid":userId}, config.refresh_secret, { expiresIn: 86400 });
+          var accessToken = jwt.sign({"userid":userId}, config.access_secret, { expiresIn: 3600 });
+
+          req.session.accessToken = accessToken;
+
+          var token = new Token({
+            refreshToken: refreshToken,
+            accessToken: accessToken,
+            userId: code.userId
+          });
+          token.save();
+
+          console.log('userId', code.userId)
+          let user = await User.find({_id: ObjectId(code.userId)});
+          console.log('user', user[0].name)
+          var response = {
+            access_token: token.accessToken,
+            refresh_token: token.refreshToken,
+            expires_in: token.expiresIn,
+            token_type: token.tokenType,
+            name: user[0].name
+          };
+          
+          res.json(response);
+        });
+      }
+    });
+  }
+}
+
 var Token = require('../models/oAuth/token');
+const { ObjectId } = require('mongodb');
 
 var authorize = function(req, res, next) {
   var accessToken;
@@ -77,6 +179,8 @@ var authorize = function(req, res, next) {
   });
 };
 
+exports.oauth_token = oauth_token;
+exports.oauth_authorise = oauth_authorise;
 exports.authorize = authorize;
 exports.validateUser = validateUser;
 exports.isPasswordComplex = isPasswordComplex;

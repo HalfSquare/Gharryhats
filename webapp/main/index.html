@@ -18,24 +18,27 @@
 </div>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  <a class="navbar-brand" href="index.html">Home</a>
+  <a class="navbar-brand" href="/index">Home</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="collapsibleNavbar">
-    <ul class="navbar-nav">
+    <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="./shop.html">Shop</a>
+        <a class="nav-link" href="/shop">Shop</a>
+      </li>
+      <li class="nav-item" >
+        <a class="nav-link" id="loginLink" href="/login">Login</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="./login">Login</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="./cart">
-            <img src="img?image=shoppingcart.png" alt="Shopping Cart" height="20" width="25">
+        <a class="nav-link" href="/cart">
+            <img src="img/shoppingcart.png" alt="Shopping Cart" height="20" width="25">
         </a>
       </li>    
     </ul>
+    <a id="logoutButton" class="navbar-link" href="/">
+      Logout
+    </a>
   </div>  
 </nav>
 
@@ -44,52 +47,73 @@
     <div class="col-sm-4">
       <h2>About Us</h2>
       <div class="aboutimg">
-        <img src="img?image=frogdoghat.png" alt="Froggy Dog Hat" height="350" width="350">
+        <img src="img/frogdoghat.png" alt="Froggy Dog Hat" height="350" width="350">
       </div>
       <br>
       <p>We sell hats for frogs, birds, cats, dogs, and lizards. Whether big or small, we'll make sure your little
         buddy feels stylish in the latest and greatest pet fashion hats.</p>
-      <h3>Quick Links</h3>
-      <ul class="nav nav-pills flex-column">
-        <li class="nav-item">
-          <a class="nav-link active" href="index.html">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#">Disabled</a>
-        </li>
-      </ul>
-      <hr class="d-sm-none">
     </div>
     <div class="col-sm-8">
       <h2>New In</h2>
       <div class="fakeimg">
-        <a href="shop.html">
-          <img src="img?image=newinimg.png" alt="New In" height="350" width="700">
+        <a href="/shop">
+          <img src="img/newinimg.png" alt="New In" height="350" width="700">
         </a>
       </div>
       <br>
       <p> Visit our store to get the latest and greatest of pet fashion. </p>
       <br>
-      <h2>TITLE HEADING</h2>
-      <h5>Title description, Sep 2, 2017</h5>
+      <h2>Whether big or small!</h2>
       <div class="newin">
-
       </div>
-      <p>Some text..</p>
-      <p>Sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
+      <p>Here at Gharryhats, we cater to all kinds of pets!</p>
+      <li>Cats</li>
+      <li>Dogs</li>
+      <li>Frogs</li>
+      <li>Lizards</li>
+      <li>Fish</li>
+      <li>Horses</li>
+      <li>Bears</li>
+      <br> 
+      <p>We also have all kinds of styles! </p>
+      <li>Sombrero</li>
+      <li>Baseball Caps</li>
+      <li>Party</li>
+      <li>Fedoras</li>
+      <li>Swimming</li>
+      <li>Beanies</li>
+      <br>
     </div>
   </div>
 </div>
 
-<div class="jumbotron text-center" style="margin-bottom:0">
+<div class="jumbotron text-center" style="bottom:0; margin-bottom: 0; width: 100%;"">
   <p>Footer</p>
 </div>
+
+<script src="/js/cookies.js"></script>
+
+<script>
+  window.addEventListener("load", init);
+  
+  function init() {
+    let loggedIn = !!getCookie("token");
+    let name = getCookie("name");
+
+    console.log("is logged in ", loggedIn);
+    console.log("name ", name);
+
+    document.getElementById('loginLink').textContent = loggedIn ? name : 'Login';
+
+    let logoutButton = document.getElementById('logoutButton')
+    logoutButton.style.visibility = loggedIn ? 'visible' : 'hidden';
+    logoutButton.addEventListener('click', () => { logout(); });
+
+  }
+
+
+  
+</script>
 
 </body>
 </html>

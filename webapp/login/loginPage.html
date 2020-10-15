@@ -1,29 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <title>Gharryhats Login</title>
+  <title>Gharryhats - Login</title>
   <meta charset="utf-8">
-  <link href="./css/design.css" rel="stylesheet">
-  <script src="./js/loginController.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</script>
 </head>
+<body>
 
-<div class="wrapper">
+  <div class="jumbotron text-center" style="margin-bottom:0">
+    <h1>Gharryhats</h1>
+    <p>Meeting all your pet's style needs!</p>
+  </div>
+
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <a class="navbar-brand" href="/">Home</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="/shop">Shop</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/login">Login</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/cart">
+            <img src="/img/shoppingcart.png" alt="Shopping Cart" height="20" width="25">
+        </a>
+      </li>  
+    </ul>
+  </div>  
+</nav>
+
+<div class="container" style="align-items: center;" >
   <div id="loginContent">
 
     <div id="loginInputContainer">
-      <h1>Gharryhats</h1>
-      <input type="text" id="login" placeholder="login">
-      <input type="password" id="password" placeholder="password">
+      <h1>Login</h1>
+      <input type="text" id="login" placeholder="Login">
+      <input type="password" id="password" placeholder="Password">
       <button id="loginBtn">Log In</button>
+      <div class="row">
+        <div class="col-md-3">
+          <a class="btn btn-outline-dark" id="googleLoginBtn" role="button" style="text-transform:none">
+            <img width="20px" style="margin-bottom:3px; margin-right:5px" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
+            Login with Google
+          </a>
+        </div>
+      </div>
     </div>
 
     <div id="formFooter">
-      <a id="signUp">Sign up</a>
+      <a id="signUp" href='/auth/signup'>Sign up</a>
       <br>
-      <a id="forgotPassword">Forgot Password?</a>
+      <a id="forgotPassword" href='#'>Forgot Password?</a>
     </div>
 
   </div>
 </div>
+
+<div class="jumbotron text-center" style="bottom:0; margin-bottom: 0; width: 100%;">
+  <p>Footer</p>
+</div>
+
+<script id='loginScript'></script>
+
+</body>
 </html>
+

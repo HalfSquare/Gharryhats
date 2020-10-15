@@ -5,21 +5,29 @@ exports.showHats = function(hats){
     let hatArray = JSON.parse(JSON.stringify(hats));
 
     hatArray.forEach(hat => {
-        htmlString += "<div id=item> ";
+        htmlString += '<div id=shopItem style="height:220px;width:400px;"> ';
         //console.log(hat);
         //console.log(hat._id);
-        htmlString += '<a href="/hat?hatid=' + hat._id + '">';
-        htmlString += '<img src="' + hat.imageUrl + '" alt="Dog Hat" height="100" width="100"></img>';
+        htmlString += '<a href="/hat/' + hat._id + '">';
+        htmlString += '<p style="float: left;"> <img src="img/' + hat.imageUrl + '" alt="' + hat.name + '" height="200" width="200"></img> </p>';
         htmlString += '</a>';
         htmlString += "<p>" + hat.name + " for " + hat.animal + "</p>";
         htmlString += "<p>" + "$" + hat.price + "</p>";
+        htmlString += '<button type="submit">Add to Cart</button>';
         htmlString += " </div>";
     });
 
-    htmlString += "<p> Length: " + hatArray.length + "</p>";
+    //htmlString += "<p> Length: " + hatArray.length + "</p>";
 
     htmlString += " </div>";
     return htmlString;
+}
+
+exports.showCartItems = function(cart) {
+    cart.items.forEach(item => {
+        console.log(item)
+    })
+    return ""
 }
 
 exports.showHat = function(hatString){
@@ -34,14 +42,10 @@ exports.showHat = function(hatString){
     let hat = hatArray[0];
 
     htmlString += "<div id=item> ";
-    htmlString += '<a href="/hat?hatid=' + hat._id + '">';
-    htmlString += '<img src="' + hat.imageUrl + '" alt="Dog Hat" height="100" width="100"></img>';
-    htmlString += '</a>';
+    htmlString += '<img src="/img/' + hat.imageUrl + '" alt="' + hat.name + '" height="300" width="300"></img>';
     htmlString += "<p>" + hat.name + " for " + hat.animal + "</p>";
     htmlString += "<p>" + "$" + hat.price + "</p>";
-    htmlString += " </div>";
-
-    //htmlString += "<p> Length: " + hatArray.length + "</p>";
-    htmlString += " </div>";
+    htmlString += '<button type="button">Add to Cart</button>';
+    htmlString += " </div></div>";
     return htmlString;
 }
