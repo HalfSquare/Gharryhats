@@ -7,7 +7,8 @@ function init(){
 }
 
 function validate_google_user(id_token) {
-    let url = 'http://localhost:8080/api/auth/google';
+    // let url = 'http://localhost:8080/api/auth/google';
+    let url = 'https://limitless-cove-65021.herokuapp.com/api/auth/google'
 
     var headers = new Headers();
     headers.append('Content-Type', 'text/plain');
