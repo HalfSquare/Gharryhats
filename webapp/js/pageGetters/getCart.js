@@ -2,6 +2,8 @@ const fs = require('fs');
 const dbFun = require('../dbFunctions');
 
 function getCart(req, res, filename, cart) {
+    cart = JSON.parse(cart);
+     console.log(cart);
     fs.readFile(filename, function (error, data) {
         if (error) {
             console.log(error);
@@ -21,8 +23,8 @@ function getCart(req, res, filename, cart) {
                         <th scope="col">Delete</th>
                     </tr>
                     </thead><tbody>`
-
-                cart.foreach(item => {
+                
+                    cart.forEach(item => {
                     cartHtml += `
                         <tr>
                         <th scope="row"></th>

@@ -14,13 +14,9 @@ function init() {
     } else {
         loginButton = document.getElementById('loginBtn');
         loginButton.addEventListener('click', loginAction);
-        document.querySelector('#forgotPassword').addEventListener('click', forgotPassAction);
         document.querySelector('#signUp').addEventListener('click', signUpAction);
         document.querySelector('#googleLoginBtn').addEventListener('click', loginGoogleAction);
     }
-
-
-
 }
 
 function forgotPassAction() {
