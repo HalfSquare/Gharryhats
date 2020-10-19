@@ -105,7 +105,7 @@ function getCookie(cname) {
 
 const CLIENT_ID = "742891582769-kve9i6a70635sc5lpme2hajavihogu17.apps.googleusercontent.com";
 const CLIENT_SECRET = "D2nxKX_rC0k60pxtO3g4xu8Y";
-const REDIRECT_URI = "http://localhost:3000/google/callback"; //TODO Update to heroku uri
+const REDIRECT_URI = "https://gharryhats.herokuapp.com/google/callback"; 
 const RESPONSE_TYPE = "id_token";
 const STATE = "LKJSAKL";
 const SCOPE = "openid profile email";

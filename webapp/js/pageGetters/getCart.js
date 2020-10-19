@@ -3,8 +3,10 @@ const dbOp = require('../dbOperations');
 const dbFun = require('../dbFunctions');
 
 async function getCart(req, res, filename, cart) {
-    cart = JSON.parse(cart);
-     console.log(cart);
+    if (cart){
+        cart = JSON.parse(cart);
+    }
+    console.log(cart);
     fs.readFile(filename, async function (error, data) {
         if (error) {
             console.log(error);

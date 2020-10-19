@@ -57,9 +57,10 @@
 
 <script>
   window.addEventListener("load", init);
+  let loggedIn;
   
   function init() {
-    let loggedIn = !!getCookie("token");
+    loggedIn = !!getCookie("token");
     let name = getCookie("name");
 
     console.log("is logged in ", loggedIn);
@@ -105,7 +106,7 @@
       .catch((err) => console.log("error", err));
       window.location.href = "/cart";
   }
-  
+
 </script>
 
 </body>

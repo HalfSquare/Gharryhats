@@ -82,7 +82,7 @@ function oauth_authorise(req, res) {
     clientId: clientId
   }, function (err, client) {
     if (!client){
-      // TODO    
+      throw Error("NoClient");
     }
     var authCode = new AuthCode({
       clientId: clientId,
@@ -111,7 +111,7 @@ function oauth_authorise(req, res) {
 async function oauth_token(req, res) {
   var grantType = req.body.grant_type;
   var authCode = req.body.code;
-  var redirectUri = req.body.redirect_uri; // TODO maybe?
+  var redirectUri = req.body.redirect_uri;
   var clientId = req.body.client_id;
   var userId = req.body.user_id;
 
@@ -120,9 +120,6 @@ async function oauth_token(req, res) {
       code: authCode
     }, async function(err, code) {
       if (code) {
-        if (code.consumed) {
-          //TODO Cancel code has already been used
-        }
         code.consumed = true;
         code.save();
 
@@ -131,7 +128,7 @@ async function oauth_token(req, res) {
         }, async function(error, client) {
 
           if (!client) {
-            // TODO
+            throw Error("NoClient");
           }
 
           var refreshToken = jwt.sign({"userid":userId}, config.refresh_secret, { expiresIn: 86400 });

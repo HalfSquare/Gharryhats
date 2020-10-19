@@ -55,17 +55,21 @@ router.get("/cart", async (req, res) => {
   console.log(req.headers.cookie);
   let cookie = req.headers.cookie;
   var name = "token=";
-  let ca = cookie.split("; ");
   let token;
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) == " ") {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      token = c.substring(name.length, c.length);
+  if (cookie){
+    let ca = cookie.split("; ");
+
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == " ") {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        token = c.substring(name.length, c.length);
+      }
     }
   }
+
   if (token) {
     let cartUrl = 'https://limitless-cove-65021.herokuapp.com/api/cart';
     // let cartUrl = "http://localhost:8080/api/cart";
