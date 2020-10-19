@@ -73,12 +73,7 @@ function oauth_authorise(req, res) {
   var redirectUri = req.query.redirect_uri;
   var scope = req.query.scope;
   var state = req.query.state;
-  if (!req.session || !req.session.user) {
-    // User is not logged in
-    // TODO direct to login page
-    console.log("user not logged in");
-    return res.redirect(LOGIN_URL);
-  }
+  let userid = req.query.userid;
 
   Client.findOne({
     clientId: clientId
@@ -88,7 +83,7 @@ function oauth_authorise(req, res) {
     }
     var authCode = new AuthCode({
       clientId: clientId,
-      userId: req.session.user.id,
+      userId: userid,
       redirectUri: redirectUri
     })
     authCode.save()
@@ -102,7 +97,7 @@ function oauth_authorise(req, res) {
       var redirect = redirectUri +
         '?code=' + response.code +
         (state === undefined ? '' : '&state=' + state)
-        + '&userid=' + req.session.user.id;
+        + '&userid=' + userid;
       res.redirect(redirect);
     } else {
       res.json(response);
@@ -139,16 +134,14 @@ async function oauth_token(req, res) {
           var refreshToken = jwt.sign({"userid":userId}, config.refresh_secret, { expiresIn: 86400 });
           var accessToken = jwt.sign({"userid":userId}, config.access_secret, { expiresIn: 3600 });
 
-          req.session.accessToken = accessToken;
-
           var token = new Token({
             refreshToken: refreshToken,
             accessToken: accessToken,
-            userId: code.userId
+            userId: userId
           });
           await token.save();
 
-          let user = await User.find({_id: ObjectId(code.userId)});
+          let user = await User.find({_id: ObjectId(userId)});
           var response = {
             access_token: token.accessToken,
             refresh_token: token.refreshToken,

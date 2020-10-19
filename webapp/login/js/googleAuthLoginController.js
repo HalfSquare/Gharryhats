@@ -27,15 +27,20 @@ function validate_google_user(id_token) {
             console.log(res)
             let accessToken = res.access_token;
             let refreshToken = res.refresh_token;
+            setCookie([['name', res.name]]);
+            console.log(accessToken)
             if (accessToken) {
-                console.log("token", accessToken)
-                
-                setCookie([['name', res.name]]);
+                setRefreshToken('refresh', refreshToken)
                 setCookie([['token', accessToken]]);
                 document.location.href = '/';
             }
         })
       .catch(err => console.log("error", err))
+}
+
+function setRefreshToken(token) {
+    let storage = window.localStorage;
+    storage.setItem("refresh", token);
 }
 
 function setCookie(cookieValues) {

@@ -115,7 +115,8 @@ router.post(LOGIN_URL, (req, res) => {
                 if (!passIsValid) {
                     throw Error("InvalidPassword")
                 }
-                req.session.user = user
+                req.query.userid = user._id
+                console.log(user._id)
                 req.query.redirect_uri = '/api/auth' + CALLBACK_URL
                 return Auth.oauth_authorise(req, res);
             }
