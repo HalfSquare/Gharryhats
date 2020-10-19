@@ -45,36 +45,41 @@
         <div id="signupContent">
 
             <div id="signupInputContainer" class="container">
+                <br>
                 <h1 class="row">Sign Up</h1>
                 <div class="row">
                     <input class="col" type="text" id="email" placeholder="Email">
-                    <p class="col-8" style="color: red;" id="emailValidText">You need to include an Email</p>
                 </div>
                 <div class="row">
                     <input class="col" type="text" id="name" placeholder="Name">
-                    <p class="col-8" style="color: red;" id="nameValidText">You need to include a name</p>
                 </div>                
                 <div class="row">
-                    <input class="col" type="password" id="password" placeholder="Password">
-                    <p class="col-8" style="color: red;" id="passwordValidText">Please make your password more secure. Include at least one uppercase, one lowercase and one number. Make sure the password is 8 characters long.</p>
+                    <input class="col" type="password" id="password" placeholder="Password">          
                 </div>
                 <div class="row">
                     <input class="col" type="password" id="confirmPassword" placeholder="Confirm Password">
-                    <p class="col-8" style="color: red;" id="confirmPasswordValidText">Ensure this matches password</p>
-                </div>
+                </div> <br>
                 <button class="row" id="signupButton">Sign Up</button>
             </div>
-
-            <!-- <div id="formFooter">
-      <a id="signUp" href='/auth/signup'>Sign up</a>
-      <br>
-      <a id="forgotPassword" href='#'>Forgot Password?</a>
-    </div> -->
-
+            <br>
+            <div class="alerts">
+                <div class="alert alert-danger" id="emailValidText">
+                    <strong>Email empty!</strong> You need to include an email.
+                </div>
+                <div class="alert alert-danger" id="nameValidText">
+                    <strong>Name empty!</strong> You need to include a name. 
+                </div>
+                <div class="alert alert-warning" id="passwordValidText">
+                    <strong>Insecure password!</strong> Please make your password more secure. Include at least one uppercase, one lowercase and one number. Make sure the password is 8 characters long.
+                </div>
+                <div class="alert alert-danger" id="confirmPasswordValidText">
+                    <strong>Password mismatch!</strong> Please ensure this is the same as the password. 
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="jumbotron text-center" style="position:fixed; bottom:0; margin-bottom:0; width: 100%;">
+    <div class="jumbotron text-center" style=" bottom:0; margin-bottom:0; width: 100%;">
         <p>Footer</p>
       </div>
 
