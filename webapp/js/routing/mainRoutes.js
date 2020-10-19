@@ -85,7 +85,8 @@ router.get("/cart", async (req, res) => {
     await fetch(cartUrl, requestOptions)
       .then((result) => {
         response = result;
-        return result.json();
+        //console.log(result.json());
+        return result.text();
       })
       .then((result) => getCart(req, res, './cart.html', result))
       .catch((err) => {

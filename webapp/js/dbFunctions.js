@@ -16,7 +16,7 @@ exports.showHats = function(hats){
         htmlString += '<div id=shopText style="margin-left:220px;"> '
         htmlString += "<p>" + hat.name + " for " + hat.animal + "</p>";
         htmlString += "<p>" + "$" + hat.price + "</p>";
-        htmlString += '<button type="submit">Add to Cart</button>';
+        htmlString += '<button type="submit" onClick="addToCart(`' + hat._id + '`)">Add to Cart</button>';
         htmlString += " </div> </div> </div>";
     });
 
