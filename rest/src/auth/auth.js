@@ -40,7 +40,7 @@ const validateUser = function (email, pass, token) {
               return;
             }
             var seconds = new Date().getTime() / 1000;
-            if (decoded.exp >= seconds) {
+            if (decoded.exp <= seconds) {
               reject(new Error("ValidationError"));
               return;
             }
@@ -173,32 +173,23 @@ async function refresh_token(req, res) {
       res.sendStatus(401).send("Validation Error");
     }
     else {
-      console.log("OK")
       Token.findOne({
         refreshToken: refresh
-      }, async function(err, token) {
-        if (err || !token) {
-          console.log(token)
+      }, async function(err, result) {
+        if (err || !result) {
           res.sendStatus(401).send("Validation Error");
         }
         else {
-          console.log("OK")
           let userId = decoded.userid
-          var refreshToken = jwt.sign({"userid":userId}, config.refresh_secret, { expiresIn: 86400 });
           var accessToken = jwt.sign({"userid":userId}, config.access_secret, { expiresIn: 3600 });
         
-          var token = new Token({
-            refreshToken: refreshToken,
-            accessToken: accessToken,
-            userId: userId
-          });
-          await token.save()
+          result.accessToken = accessToken;
+          await result.save()
           User.find({_id: ObjectId(userId)}).then(user => {
             var response = {
-              access_token: token.accessToken,
-              refresh_token: token.refreshToken,
-              expires_in: token.expiresIn,
-              token_type: token.tokenType,
+              access_token: result.accessToken,
+              expires_in: result.expiresIn,
+              token_type: result.tokenType,
               name: user[0].name
             };
             

@@ -93,7 +93,6 @@ router.get("/cart", function (req, res) {
         console.log(err)
       }
     })
-   
   }).catch((err) => {
     res.status(401).send("Validation Error");
     res.end()
