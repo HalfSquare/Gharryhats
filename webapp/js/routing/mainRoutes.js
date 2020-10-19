@@ -9,6 +9,7 @@ const getError = require("../pageGetters/getError");
 const getCart = require("../pageGetters/getCart");
 const getLogin = require("../pageGetters/getLogin");
 const getJs = require("../pageGetters/getJs");
+const getRefresh = require("../pageGetters/getRefresh");
 // const token = require("../../../rest/src/models/oAuth/token");
 
 const fetch = require("node-fetch");
@@ -71,7 +72,7 @@ router.get("/cart", async (req, res) => {
     var headers = {
       "Content-Type": "applocation/json",
       Accept: "application/json, text/plain, */*",
-      token: token,
+      token: token
     };
 
     let requestOptions = {
@@ -88,7 +89,9 @@ router.get("/cart", async (req, res) => {
         return result.text();
       })
       .then((result) => getCart(req, res, './cart.html', result))
-      .catch((err) => console.log("error", err));
+      .catch((err) => {
+        getRefresh(req, res, './refresh.html', './refreshController.js', req.path)
+      });
   } else {
     getCart(req, res, "./cart.html");
   }

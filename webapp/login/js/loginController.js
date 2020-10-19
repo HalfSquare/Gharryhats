@@ -61,6 +61,7 @@ async function loginAction() {
         .then(res => {
             setCookie([['token', res.access_token]]);
             setCookie([['name', res.name]]);
+            setRefreshToken(res.refresh_token);
             document.location.href = '/';
         })
         .catch(err => console.log("error", err))
@@ -80,6 +81,11 @@ function setCookie(cookieValues) {
         cookies = cookies + item[0] + '=' + item[1] + ';';
         document.cookie = cookies + expires + ";path=/";
     });
+}
+
+function setRefreshToken(token) {
+    let storage = document.defaultView.localStorage
+    storage.setItem('refresh', token);
 }
 
 function getCookie(cname) {

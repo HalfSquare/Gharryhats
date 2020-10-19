@@ -15,6 +15,8 @@ const CALLBACK_URL = "/callback";
 const OAUTH_AUTHERISE_URL = '/oauth/authorise';
 const OAUTH_TOKEN_URL = '/oauth/token';
 
+const REFRESH_URL = '/refresh';
+
 const OAUTH_CLIENTID = "e47532c3-3c2b-4e38-a534-8b709772e4a0";
 
 const express = require('express');
@@ -79,14 +81,14 @@ router.post(GOOGLE_AUTHORISE, async (req, res) => {
         User.findOne({ email: json.email })
         .then(user => {
             if (user) {
-                req.session.user = user
+                req.query.userid = user._id
                 req.query.redirect_uri = '/api/auth' + CALLBACK_URL
                 Auth.oauth_authorise(req, res);
             }
             else {
                 new User({ email: email, name: name, googleID: googleID }).save()
                 .then(user => {
-                    req.session.user = user
+                    req.query.userid = user._id
                     req.query.redirect_uri = '/api/auth' + CALLBACK_URL
                     create_cart(user)
                     Auth.oauth_authorise(req, res);
@@ -113,7 +115,8 @@ router.post(LOGIN_URL, (req, res) => {
                 if (!passIsValid) {
                     throw Error("InvalidPassword")
                 }
-                req.session.user = user
+                req.query.userid = user._id
+                console.log(user._id)
                 req.query.redirect_uri = '/api/auth' + CALLBACK_URL
                 return Auth.oauth_authorise(req, res);
             }
@@ -128,6 +131,10 @@ router.get(CALLBACK_URL, (req, res) => {
     req.body.client_id = OAUTH_CLIENTID;
     req.body.user_id = req.query.userid;
     return Auth.oauth_token(req, res);
+})
+
+router.post(REFRESH_URL, (req, res) => {
+    return Auth.refresh_token(req, res);
 })
 
 // LOGOUT

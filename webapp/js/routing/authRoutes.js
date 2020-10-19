@@ -15,7 +15,6 @@ router.post("/login", cors(), (req, res) => {
     let email = req.headers.email;
     let password = req.headers.password;
 
-
     console.log("email: ", email)
     console.log("password: ", password)
     res.send(JSON.stringify({

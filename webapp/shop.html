@@ -24,12 +24,12 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="collapsibleNavbar">
-      <ul class="navbar-nav">
+      <ul class="navbar-nav mr-auto">
         <li class="nav-item">
           <a class="nav-link" href="/shop">Shop</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/login">Login</a>
+          <a class="nav-link" id="loginLink" href="/login">Login</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/cart">
@@ -37,6 +37,9 @@
           </a>
         </li>
       </ul>
+      <a id="logoutButton" class="navbar-link" href="/">
+        Logout
+      </a>
     </div>
   </nav>
 
@@ -59,9 +62,21 @@
 
 <script>
   window.addEventListener("load", init);
+  
   function init() {
-
+    let loggedIn = !!getCookie("token");
+      let name = getCookie("name");
+  
+      console.log("is logged in ", loggedIn);
+      console.log("name ", name);
+  
+      document.getElementById('loginLink').textContent = loggedIn ? name : 'Login';
+  
+      let logoutButton = document.getElementById('logoutButton')
+      logoutButton.style.visibility = loggedIn ? 'visible' : 'hidden';
+      logoutButton.addEventListener('click', () => { logout(); });
   }
+  
   async function addToCart(hatId) {
     console.log(hatId);
     let headers = {

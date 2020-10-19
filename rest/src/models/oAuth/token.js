@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var uuid = require('node-uuid');
 
 var TokenModel = function() {
   var tokenSchema = mongoose.Schema({
