@@ -17,11 +17,14 @@ const invalidCredentials = (resolve, reject) => {
   reject(Error("CredentialsNotGiven"));
 }
 
-const validateUser = function (email, pass, token) {
-  if (typeof email === 'object' && email != null) {
-    pass = email.password;
-    token = email.token;
-    email = email.email;
+const validateUser = function (obj, pass, token) {
+  let email;
+  if (typeof obj === 'object' && obj != null) {
+    pass = obj.password;
+    token = obj.token;
+    email = obj.email;
+  } else {
+    email = obj;
   }
 
   // Token validation

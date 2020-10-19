@@ -9,7 +9,7 @@ var uuid = require('node-uuid');
 const LOGIN_URL = "/login";
 const SIGNUP_URL = "/signup";
 const LOGOUT_URL = "/logout";
-const GOOGLE_AUTHORISE = "/google"
+const GOOGLE_AUTHORISE = "/google";
 
 const CALLBACK_URL = "/callback";
 const OAUTH_AUTHERISE_URL = '/oauth/authorise';
