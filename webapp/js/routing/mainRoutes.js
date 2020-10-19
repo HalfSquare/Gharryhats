@@ -67,8 +67,8 @@ router.get("/cart", async (req, res) => {
     }
   }
   if (token) {
-    // let cartUrl = 'https://limitless-cove-65021.herokuapp.com/api/cart';
-    let cartUrl = "http://localhost:8080/api/cart";
+    let cartUrl = 'https://limitless-cove-65021.herokuapp.com/api/cart';
+    // let cartUrl = "http://localhost:8080/api/cart";
     var headers = {
       "Content-Type": "applocation/json",
       Accept: "application/json, text/plain, */*",
