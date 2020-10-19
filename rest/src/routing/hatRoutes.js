@@ -78,13 +78,14 @@ router.delete(HAT_BY_ID_URL, function (req, res) {
 });
 
 router.get("/cart", function (req, res) {
-  Auth.validateUser(req.headers).then(() => {
+  Auth.validateUser(req.headers).then((err, a) => {
     jwt.verify(req.headers.token, config.access_secret, (err, decoded) => {
       if (!err) {
         let userid = decoded.userid
         Cart.find({ userId: userid }).then((cart) => {
-          res.writeHead(200, {'Content-Type': 'application/json'}) 
-          res.write(JSON.stringify(cart ? cart[0].items ?? [] : []));
+          res.writeHead(200, {'Content-Type': 'application/json'})
+          console.log('CART:', cart); 
+          res.write(JSON.stringify(cart[0] ? cart[0].items ?? [] : []));
           res.end();
         });
       }
@@ -92,18 +93,10 @@ router.get("/cart", function (req, res) {
         console.log(err)
       }
     })
-   
-  });
+  }).catch((err) => {
+    res.status(401).send("Validation Error");
+    res.end()
+  })
 });
-
-function parseJwt (token) {
-  var base64Url = token.split('.')[1];
-  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
-
-  return JSON.parse(jsonPayload);
-};
 
 module.exports = router;

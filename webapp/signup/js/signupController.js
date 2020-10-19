@@ -35,8 +35,8 @@ function init(){
 async function signupAction() {
     console.log("signup!")
 
-    // let signupUrl = 'https://limitless-cove-65021.herokuapp.com/api/auth/signup';
-    let signupUrl = 'http://localhost:8080/api/auth/signup';
+    let signupUrl = 'https://limitless-cove-65021.herokuapp.com/api/auth/signup';
+    // let signupUrl = 'http://localhost:8080/api/auth/signup';
 
     emailValid = !!email.value;
     nameValid = !!name.value;
@@ -78,9 +78,14 @@ async function signupAction() {
     validationTextsUpdate();
 }
 
+// Toggle whether alerts should be visible or hidden
 function validationTextsUpdate() {
-    passwordValidText.style.visibility = passwordValid ? 'hidden' : 'visible';
-    confirmPasswordValidText.style.visibility = confirmPasswordValid ? 'hidden' : 'visible';
-    emailValidText.style.visibility = emailValid ? 'hidden' : 'visible';
-    nameValidText.style.visibility = nameValid ? 'hidden' : 'visible';
+    // passwordValidText.style.visibility = passwordValid ? 'hidden' : 'visible';
+    passwordValidText.style.display = passwordValid ? 'none' : 'block';
+    // confirmPasswordValidText.style.visibility = confirmPasswordValid ? 'hidden' : 'visible';
+    confirmPasswordValidText.style.display = confirmPasswordValid ? 'none' : 'block';
+    // emailValidText.style.visibility = emailValid ? 'hidden' : 'visible';
+    emailValidText.style.display = emailValid ? 'none' : 'block';
+    // nameValidText.style.visibility = nameValid ? 'hidden' : 'visible';
+    nameValidText.style.display = nameValid ? 'none' : 'block';
 }

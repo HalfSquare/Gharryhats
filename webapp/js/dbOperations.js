@@ -70,7 +70,7 @@ exports.getItem = function(id) {
             if (err) {
                 reject(docs);
             } else {
-                console.log(docs);
+                //console.log(docs);
                 resolve(docs);
             }
         });
@@ -97,4 +97,19 @@ exports.getUser = function() {
     //TO-DO
     console.log("Getting user");
     return 'undefined';
+}
+
+exports.getRelated = function(animal) {
+    console.log("ANIMAL: ", animal)
+    let getRelated = new Promise((resolve, reject) => {
+        db.collection(HATS_COLLECTION).find({"animal":animal}).toArray(function (err, docs) {
+            if (err) {
+                reject(docs);
+            } else {
+                console.log("GET RELATED", docs);
+                resolve(docs);
+            }
+        });
+    }) 
+    return getRelated;
 }

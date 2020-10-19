@@ -14,13 +14,9 @@ function init() {
     } else {
         loginButton = document.getElementById('loginBtn');
         loginButton.addEventListener('click', loginAction);
-        document.querySelector('#forgotPassword').addEventListener('click', forgotPassAction);
         document.querySelector('#signUp').addEventListener('click', signUpAction);
         document.querySelector('#googleLoginBtn').addEventListener('click', loginGoogleAction);
     }
-
-
-
 }
 
 function forgotPassAction() {
@@ -36,8 +32,8 @@ async function loginAction() {
 
     loginButton.disabled = true;
 
-    let loginUrl = 'http://localhost:8080/api/auth/login'
-    // let loginUrl = 'https://limitless-cove-65021.herokuapp.com/api/auth/login';
+    // let loginUrl = 'http://localhost:8080/api/auth/login'
+    let loginUrl = 'https://limitless-cove-65021.herokuapp.com/api/auth/login';
     let email = document.querySelector("#login").value
     let password = document.querySelector("#password").value
 
@@ -65,6 +61,7 @@ async function loginAction() {
         .then(res => {
             setCookie([['token', res.access_token]]);
             setCookie([['name', res.name]]);
+            setRefreshToken(res.refresh_token);
             document.location.href = '/';
         })
         .catch(err => console.log("error", err))
@@ -86,6 +83,11 @@ function setCookie(cookieValues) {
     });
 }
 
+function setRefreshToken(token) {
+    let storage = document.defaultView.localStorage
+    storage.setItem('refresh', token);
+}
+
 function getCookie(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -103,7 +105,7 @@ function getCookie(cname) {
 
 const CLIENT_ID = "742891582769-kve9i6a70635sc5lpme2hajavihogu17.apps.googleusercontent.com";
 const CLIENT_SECRET = "D2nxKX_rC0k60pxtO3g4xu8Y";
-const REDIRECT_URI = "http://localhost:3000/google/callback"; //TODO Update to heroku uri
+const REDIRECT_URI = "https://gharryhats.herokuapp.com/google/callback"; 
 const RESPONSE_TYPE = "id_token";
 const STATE = "LKJSAKL";
 const SCOPE = "openid profile email";
