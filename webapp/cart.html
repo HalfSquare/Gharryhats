@@ -73,6 +73,39 @@
 
   }
   
+  async function removeFromCart(hatId) {
+    console.log(hatId);
+    let headers = {
+      "Content-Type": "applocation/json",
+      Accept: "application/json, text/plain, */*",
+      token: getCookie("token"),
+      hatId: hatId,
+    };
+
+    console.log(headers.hatId)
+
+    let requestOptions = {
+      method: "DELETE",
+      headers: headers,
+      redirect: "follow",
+    };
+
+    let cartUrl = 'https://limitless-cove-65021.herokuapp.com/api/cart';
+    // let cartUrl = "http://localhost:8080/api/cart";
+    
+    let response;
+    await fetch(cartUrl, requestOptions)
+      .then((result) => {
+        response = result;
+        //console.log(result.json());
+        
+        return result.text();
+      })
+      .then((result) => console.log(result))
+      .catch((err) => console.log("error", err));
+      window.location.href = "/cart";
+  }
+  
 </script>
 
 </body>

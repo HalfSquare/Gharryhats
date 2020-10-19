@@ -36,7 +36,7 @@ async function getCart(req, res, filename, cart) {
                             <th scope="row"></th>
                             <td>${res.name} for ${res.animal}</td>
                             <td>$${res.price}</td>
-                            <td><button>Delete</button></td>
+                            <td><button onClick="removeFromCart('${res._id}')">Delete</button></td>
                             </tr>
                             `
                         ;})
