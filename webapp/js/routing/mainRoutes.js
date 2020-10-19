@@ -66,12 +66,12 @@ router.get("/cart", async (req, res) => {
     }
   }
   if (token) {
-    let cartUrl = 'https://limitless-cove-65021.herokuapp.com/api/cart';
-    // let cartUrl = "http://localhost:8080/api/cart";
+    // let cartUrl = 'https://limitless-cove-65021.herokuapp.com/api/cart';
+    let cartUrl = "http://localhost:8080/api/cart";
     var headers = {
       "Content-Type": "applocation/json",
       Accept: "application/json, text/plain, */*",
-      token: token,
+      token: token
     };
 
     let requestOptions = {
@@ -87,11 +87,55 @@ router.get("/cart", async (req, res) => {
         return result.json();
       })
       .then((result) => getCart(req, res, './cart.html', result))
-      .catch((err) => console.log("error", err));
+      .catch((err) => {
+        refreshToken().then((result) => {
+          console.log(result)
+        }).catch(err => {
+          console.log(err)
+          res.redirect("/auth/logout");
+        }) 
+      });
   } else {
     getCart(req, res, "./cart.html");
   }
 });
+
+async function refreshToken() {
+  return new Promise(async (resolve, reject) => {
+    // let refreshUrl = 'https://limitless-cove-65021.herokuapp.com/auth/refresh';
+    let refreshUrl = "http://localhost:8080/api/auth/refresh";
+    var headers = {
+      "Content-Type": "applocation/json",
+      Accept: "application/json, text/plain, */*",
+      refresh_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1Zjg3OGY1MTBjY2IzODM1NDRmMzhkMTMiLCJpYXQiOjE2MDMwODQxMTcsImV4cCI6MTYwMzE3MDUxN30.ZMtJ9wgNYuk2hus1C_avtvXGwVkUx0MkvocFJ8pVCF8"
+    };
+
+    let requestOptions = {
+      method: "POST",
+      headers: headers,
+      redirect: "follow",
+    };
+
+    let response;
+    await fetch(refreshUrl, requestOptions)
+    .then((result) => {
+      response = result;
+      return result.json();
+    })
+    .then((result) => {
+      console.log(result)
+      resolve(result);
+    })
+    .catch((err) => {
+      reject(new Error("ValidationError"));
+    });
+  })
+}
+
+function getRefreshToken() {
+  let storage = document.defaultView.localStorage
+  return storage.getItem('refresh')
+}
 
 function getCookie(cookie) {
   var name = cookie + "=";

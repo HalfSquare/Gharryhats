@@ -4,6 +4,8 @@ const AuthCode = require('../models/oAuth/authCode');
 const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config');
 const { Error } = require('../error/CustomMongoError');
+const Token = require('../models/oAuth/token');
+const { ObjectId } = require('mongodb');
 
 // At least one uppercase, one lowercase and one number with a min length
 const passwordMinLength = 8;
@@ -27,10 +29,26 @@ const validateUser = function (email, pass, token) {
     return new Promise((resolve, reject) => {
       jwt.verify(token, config.access_secret, (err, decoded) => {
         if (err) {
-          reject(Error("ValidationError"));
+          reject(new Error("ValidationError"));
         }
-        //TODO check if token is in db
-        resolve();
+        else {
+          Token.findOne({
+            accessToken: token
+          }, function(err, accessToken) {
+            if (err || !accessToken) {
+              reject(new Error("ValidationError"));
+              return;
+            }
+            var seconds = new Date().getTime() / 1000;
+            if (decoded.exp >= seconds) {
+              reject(new Error("ValidationError"));
+              return;
+            }
+            else {
+              resolve();
+            }
+          });
+        }
       })
     });
   }
@@ -128,11 +146,9 @@ async function oauth_token(req, res) {
             accessToken: accessToken,
             userId: code.userId
           });
-          token.save();
+          await token.save();
 
-          console.log('userId', code.userId)
           let user = await User.find({_id: ObjectId(code.userId)});
-          console.log('user', user[0].name)
           var response = {
             access_token: token.accessToken,
             refresh_token: token.refreshToken,
@@ -148,39 +164,54 @@ async function oauth_token(req, res) {
   }
 }
 
-var Token = require('../models/oAuth/token');
-const { ObjectId } = require('mongodb');
+// Refresh token
+async function refresh_token(req, res) {
+  let refresh = req.headers.refresh_token
 
-var authorize = function(req, res, next) {
-  var accessToken;
-
-  if (req.headers.authorization) {
-    var parts = req.headers.authorization.split(' ');
-
-    if (parts.length < 2) {
-      res.set('WWW-Authenticate', 'Bearer');
-      res.sendStatus('401');
-      return;
+  jwt.verify(refresh, config.refresh_secret, async (err, decoded) => {
+    if(err || !decoded) {
+      res.sendStatus(401).send("Validation Error");
     }
-    accessToken = parts[1];
-  } else {
-    accessToken = req.query.access_token || req.body.access_token;
-  }
+    else {
+      console.log("OK")
+      Token.findOne({
+        refreshToken: refresh
+      }, async function(err, token) {
+        if (err || !token) {
+          console.log(token)
+          res.sendStatus(401).send("Validation Error");
+        }
+        else {
+          console.log("OK")
+          let userId = decoded.userid
+          var refreshToken = jwt.sign({"userid":userId}, config.refresh_secret, { expiresIn: 86400 });
+          var accessToken = jwt.sign({"userid":userId}, config.access_secret, { expiresIn: 3600 });
+        
+          var token = new Token({
+            refreshToken: refreshToken,
+            accessToken: accessToken,
+            userId: userId
+          });
+          await token.save()
+          User.find({_id: ObjectId(userId)}).then(user => {
+            var response = {
+              access_token: token.accessToken,
+              refresh_token: token.refreshToken,
+              expires_in: token.expiresIn,
+              token_type: token.tokenType,
+              name: user[0].name
+            };
+            
+            res.json(response);
+          })
+        }
+      })
+    }
+  })
+}
 
-  Token.findOne({
-    accessToken: accessToken
-  }, function(err, token) {
-    Token.update({
-      userId: token.userId,
-      consumed: false
-    }, {
-      $set: { consumed: true }
-    });
-  });
-};
-
+exports.refresh_token = refresh_token;
 exports.oauth_token = oauth_token;
 exports.oauth_authorise = oauth_authorise;
-exports.authorize = authorize;
 exports.validateUser = validateUser;
 exports.isPasswordComplex = isPasswordComplex;

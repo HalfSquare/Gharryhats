@@ -15,6 +15,8 @@ const CALLBACK_URL = "/callback";
 const OAUTH_AUTHERISE_URL = '/oauth/authorise';
 const OAUTH_TOKEN_URL = '/oauth/token';
 
+const REFRESH_URL = '/refresh';
+
 const OAUTH_CLIENTID = "e47532c3-3c2b-4e38-a534-8b709772e4a0";
 
 const express = require('express');
@@ -128,6 +130,10 @@ router.get(CALLBACK_URL, (req, res) => {
     req.body.client_id = OAUTH_CLIENTID;
     req.body.user_id = req.query.userid;
     return Auth.oauth_token(req, res);
+})
+
+router.post(REFRESH_URL, (req, res) => {
+    return Auth.refresh_token(req, res);
 })
 
 // LOGOUT
