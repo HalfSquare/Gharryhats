@@ -82,7 +82,7 @@ function oauth_authorise(req, res) {
     clientId: clientId
   }, function (err, client) {
     if (!client){
-      throw Error("NoClient");
+      // throw Error("NoClient");
     }
     var authCode = new AuthCode({
       clientId: clientId,
@@ -128,7 +128,7 @@ async function oauth_token(req, res) {
         }, async function(error, client) {
 
           if (!client) {
-            throw Error("NoClient");
+            // throw Error("NoClient");
           }
 
           var refreshToken = jwt.sign({"userid":userId}, config.refresh_secret, { expiresIn: 86400 });
