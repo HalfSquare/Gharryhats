@@ -81,14 +81,14 @@ router.post(GOOGLE_AUTHORISE, async (req, res) => {
         User.findOne({ email: json.email })
         .then(user => {
             if (user) {
-                req.session.user = user
+                req.query.userid = user._id
                 req.query.redirect_uri = '/api/auth' + CALLBACK_URL
                 Auth.oauth_authorise(req, res);
             }
             else {
                 new User({ email: email, name: name, googleID: googleID }).save()
                 .then(user => {
-                    req.session.user = user
+                    req.query.userid = user._id
                     req.query.redirect_uri = '/api/auth' + CALLBACK_URL
                     create_cart(user)
                     Auth.oauth_authorise(req, res);
