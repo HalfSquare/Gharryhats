@@ -5,6 +5,7 @@ const cors = require('cors');
 
 const hatRoutes = require('./routing/hatRoutes');
 const authRoutes = require('./routing/authRoutes');
+const cartRoutes = require('./routing/cartRoutes');
 
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
@@ -50,5 +51,7 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/test", { 
 
 
 app.use('/api/auth', authRoutes);
+
+app.use('/api/cart', cartRoutes);
 
 app.use('/api', hatRoutes);

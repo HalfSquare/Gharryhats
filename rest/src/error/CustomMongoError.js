@@ -6,6 +6,7 @@ const errorCodes = {
   "HatNotFound": 5,
   "InvalidPassword": 6,
   "PasswordNotComplex": 7,
+  "NoCartFoundForUser": 8,
 }
 
 const error = function(code) {return { name: "CustomMongoError", code: errorCodes[code] }; }

@@ -18,6 +18,7 @@ function handleMongooseError(res, err, code) {
         break;
       case 2:
         res.status(code || 401).json({ "error": "Credentials invalid. Please provide a user and password or a session token." })
+        break;
       case 4:
         res.status(code || 401).json({ "error": "No user with matching credentials" })
         break;
