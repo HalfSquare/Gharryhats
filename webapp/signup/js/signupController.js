@@ -78,9 +78,14 @@ async function signupAction() {
     validationTextsUpdate();
 }
 
+// Toggle whether alerts should be visible or hidden
 function validationTextsUpdate() {
-    passwordValidText.style.visibility = passwordValid ? 'hidden' : 'visible';
-    confirmPasswordValidText.style.visibility = confirmPasswordValid ? 'hidden' : 'visible';
-    emailValidText.style.visibility = emailValid ? 'hidden' : 'visible';
-    nameValidText.style.visibility = nameValid ? 'hidden' : 'visible';
+    // passwordValidText.style.visibility = passwordValid ? 'hidden' : 'visible';
+    passwordValidText.style.display = passwordValid ? 'none' : 'block';
+    // confirmPasswordValidText.style.visibility = confirmPasswordValid ? 'hidden' : 'visible';
+    confirmPasswordValidText.style.display = confirmPasswordValid ? 'none' : 'block';
+    // emailValidText.style.visibility = emailValid ? 'hidden' : 'visible';
+    emailValidText.style.display = emailValid ? 'none' : 'block';
+    // nameValidText.style.visibility = nameValid ? 'hidden' : 'visible';
+    nameValidText.style.display = nameValid ? 'none' : 'block';
 }
